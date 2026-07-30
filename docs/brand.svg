@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" font-family="'Outfit','Helvetica Neue',Helvetica,Arial,sans-serif">
+  <!--
+    Identity sheet for lingua-open. Drawn by hand, not generated, so it can go
+    stale without anything failing. Two things to re-check if you touch the
+    design system:
+
+      * the seed. This sheet is drawn from #4A6572. If scripts/gen-theme.mjs
+        changes seed, the swatches in panel 05 and the mark colours here are
+        wrong until they are updated by hand.
+      * the mark. The path below is a copy of MARK in src/components/Logo.tsx,
+        which is the source of truth.
+
+    Panel 03 embeds real rasterised pixels of public/favicon.svg at 16, 24 and
+    32 px, shown enlarged with image-rendering: pixelated. Redo them by
+    rasterising the favicon at those exact sizes; do not redraw them as vectors,
+    because the whole point of that panel is what the pixel grid actually does
+    to the mark.
+  -->
+  <defs>
+    <path id="mark" fill-rule="evenodd" d="M7 2h10a5 5 0 0 1 5 5v5a5 5 0 0 1-5 5h-5.5L6.2 21 8.2 17H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5ZM8 7a1.25 1.25 0 0 1 1.25 1.25v2.5a1.25 1.25 0 0 1-2.5 0v-2.5A1.25 1.25 0 0 1 8 7ZM12 5a1.25 1.25 0 0 1 1.25 1.25v6.5a1.25 1.25 0 0 1-2.5 0v-6.5A1.25 1.25 0 0 1 12 5ZM16 6.25a1.25 1.25 0 0 1 1.25 1.25v4a1.25 1.25 0 0 1-2.5 0v-4a1.25 1.25 0 0 1 1.25-1.25Z"/>
+    <style>
+      .panel { fill:#1e2225; stroke:#2b3135; stroke-width:1 }
+      .lab { fill:#6f7c83; font-size:12px; letter-spacing:1.6px; text-transform:uppercase }
+      .num { fill:#3f4a50; font-size:12px; letter-spacing:1.2px }
+      .cap { fill:#8b979e; font-size:14px }
+      .hex { fill:#8b979e; font-size:12px; font-family:'JetBrains Mono',ui-monospace,monospace }
+      .big { fill:#e6edf1; font-size:34px; font-weight:600; letter-spacing:-0.6px }
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#16191c"/>
+
+  <!-- 01 mark -->
+  <rect class="panel" x="40" y="40" width="488" height="446" rx="14"/>
+  <text class="lab" x="72" y="80">01 / Mark</text>
+  <g transform="translate(284 232) scale(7) translate(-12 -11.5)"><use href="#mark" fill="#8bd0ef"/></g>
+  <text class="big" x="284" y="392" text-anchor="middle">lingua-open</text>
+  <text class="cap" x="284" y="422" text-anchor="middle">Speak freely. Literally.</text>
+  <text class="num" x="496" y="466" text-anchor="end">01</text>
+
+  <!-- 02 construction -->
+  <rect class="panel" x="556" y="40" width="488" height="446" rx="14"/>
+  <text class="lab" x="588" y="80">02 / Construction</text>
+  <g transform="translate(800 250) scale(11) translate(-12 -12)">
+    <g stroke="#2f383d" stroke-width="0.09" fill="none"><line x1="0" y1="0" x2="0" y2="24"/><line x1="0" y1="0" x2="24" y2="0"/><line x1="4" y1="0" x2="4" y2="24"/><line x1="0" y1="4" x2="24" y2="4"/><line x1="8" y1="0" x2="8" y2="24"/><line x1="0" y1="8" x2="24" y2="8"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/><line x1="16" y1="0" x2="16" y2="24"/><line x1="0" y1="16" x2="24" y2="16"/><line x1="20" y1="0" x2="20" y2="24"/><line x1="0" y1="20" x2="24" y2="20"/><line x1="24" y1="0" x2="24" y2="24"/><line x1="0" y1="24" x2="24" y2="24"/></g>
+    <use href="#mark" fill="#8bd0ef" fill-opacity="0.16"/>
+    <use href="#mark" fill="none" stroke="#8bd0ef" stroke-width="0.14"/>
+  </g>
+  <text class="cap" x="588" y="432">24-unit grid · corner radius 5 · voice on a 4-unit pitch</text>
+  <text class="num" x="1012" y="466" text-anchor="end">02</text>
+
+  <!-- 03 legibility -->
+  <rect class="panel" x="1072" y="40" width="488" height="446" rx="14"/>
+  <text class="lab" x="1104" y="80">03 / Legibility</text>
+  <image x="1128" y="150" width="64" height="64" image-rendering="pixelated" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAh1BMVEX////j8/uo3POO0e+L0O+c1/GKz++K0O+N0e+54/WT0/CP0e+X1fHx+f2t3vTB5vaS0/Cb1vHl9PvJ6fia1vHy+v2d1/Hg8vv9/v+m2/OJz+/+/v/i8/ud1/Kb1/Hm9fyz4PSM0O+Z1vH1+/7M6vip3PPk9Pv0+v35/f6v3/S85PbW7/n6/f6S3yIJAAAAkElEQVQY03WO2RKCMAxFb0tLAKl7tdayibv+//eZOj6gjOchk5vkJgGETNSHRApA6DTmRDGmWkCyJpXleUacpRJxvpiUxpTT2Zxd4P5iuVpbu9m6nVeKC17uQ2VtFZz8U/ixjJaOzobax6c8RyJfB6BpddlRcWB024Bx/bE7na0x5uLw5nq79xjSPNyXxnMoXqp9C0VdOxYdAAAAAElFTkSuQmCC"/>
+  <image x="1236" y="140" width="96" height="96" image-rendering="pixelated" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAq1BMVEX////z+v3E5/ec1/GN0e+L0O/r9/yo3POM0O+K0O+Jz++P0vCu3vSz4PX7/f6Q0vCO0e+R0vCV1PDF6PeIz++q3fPk9PvT7fmX1fHb8frs9/yw3/TF5/fW7vn+/v+t3vSv3vT+///X7/nZ8Pqx3/Sn3PP0+/7L6vib1vGZ1vH6/f7q9/yi2fK24fXx+f3Y7/qU1PD4/P6n2/Og2PLf8vu24vXv+f39/v/m9ftGiDRmAAAA10lEQVQoz42R6XLCMAyE14kVR+JoCRQoUNqUIxwtdwvv/2R1DBnSmXiG75e069HaMgAVhJpK6DBQsEQmZvoHxyay540UgtwroxDERVer12tFHQcIr3OYpNFsNoSennOBQ7hcbiUkbaDdeen2ktzRcHr/dTDsWGPEbxi/uyhnyEeKTx5ZgyZIpyVjmmJCN2P8kOEbVRnuva73gd6VeJeIaEbCbh7fEJpF+YfMM7NYtqyeLB0Lk81xZaXWX6K/1xuHWuHOVu+ycl+wPxxPqGL781upny97PMwfrhgWV3ng+ioAAAAASUVORK5CYII="/>
+  <image x="1376" y="132" width="128" height="128" image-rendering="pixelated" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAzFBMVEX////9/v/e8vqz4PSX1fGN0e+L0O/0+/695PaS0/CK0O+v3vSKz++g2fKM0O/B5vb2/P6Jz++W1PHu+P2Y1fGl2vOU1PCP0vCZ1vHx+f2j2vLq9vz6/f7f8vvP6/jw+f3a8Pqa1vHK6fi14fWx3/T+///F5/fP7Pi74/bQ7Pi85Pbi8/uk2vKW1fH4/P7y+v3z+v3J6fiR0vDC5vfv+P35/P6o3POc1/HY7/rV7vms3fSm2/OO0e/3/P7U7fmd1/HW7vn+/v/H6Pfn9fzAmqBNAAABFUlEQVQ4y6WS6XKCMBRGPyABckUwaluodqGt1aLF7vvu+7+TUWIHbCUz7fnDzP1Owk1yAcCyHcbdNThzbAtLPF8QuT8gEr63zBu/xYXSUIblV+IgqCi+BVuUBd5slrshYcMp52HUakWhCqSukgO2EtSX2h2g0ya3u7VdlIlB70ic7RDFCZDEcrfX3+sWBodeL/YPDlOphSN1uGNZBFqQJwPgdCUMlTBaE0aqdmYShv8Wan9harLmmMaLMl618bGMz20cGOPIKSMTUpK26BspReYVY22Ns0kany+aC1msSSfZWI/9gnx6cRm6dHV9k2imOarc3sng/mGAjTxy96m3OUb+/BK91uR4e//4rMvzrxlq6ef4K3PGmSWXSnH7uAAAAABJRU5ErkJggg=="/>
+  <text class="hex" x="1160" y="290" text-anchor="middle">16 px</text>
+  <text class="hex" x="1284" y="290" text-anchor="middle">24 px</text>
+  <text class="hex" x="1440" y="290" text-anchor="middle">32 px</text>
+  <text class="cap" x="1104" y="418">Real pixels, shown enlarged. No plate in the tab:</text>
+  <text class="cap" x="1104" y="440">the mark keeps three bars down to 16 px.</text>
+  <text class="num" x="1528" y="466" text-anchor="end">03</text>
+
+  <!-- 04 application -->
+  <rect class="panel" x="40" y="514" width="488" height="446" rx="14"/>
+  <text class="lab" x="72" y="554">04 / Application</text>
+  <rect x="96" y="596" width="160" height="160" rx="36" fill="#116682"/>
+  <g transform="translate(176 676) scale(4) translate(-12 -11.5)"><use href="#mark" fill="#ffffff"/></g>
+  <rect x="312" y="596" width="160" height="160" rx="0" fill="#116682"/>
+  <circle cx="392" cy="676" r="64" fill="none" stroke="#bde9ff" stroke-width="1" stroke-dasharray="4 4" opacity="0.65"/>
+  <g transform="translate(392 676) scale(3.3) translate(-12 -11.5)"><use href="#mark" fill="#ffffff"/></g>
+  <text class="hex" x="176" y="790" text-anchor="middle">app icon</text>
+  <text class="hex" x="392" y="790" text-anchor="middle">maskable</text>
+  <text class="cap" x="72" y="900">The plate returns where the platform expects a tile.</text>
+  <text class="cap" x="72" y="922">Dashed ring is the maskable safe zone.</text>
+  <text class="num" x="496" y="940" text-anchor="end">04</text>
+
+  <!-- 05 palette -->
+  <rect class="panel" x="556" y="514" width="488" height="446" rx="14"/>
+  <text class="lab" x="588" y="554">05 / Palette</text>
+  <rect x="588" y="596" width="200" height="96" rx="10" fill="#116682"/>
+  <rect x="812" y="596" width="200" height="96" rx="10" fill="#bde9ff"/>
+  <rect x="588" y="716" width="200" height="96" rx="10" fill="#8bd0ef"/>
+  <rect x="812" y="716" width="200" height="96" rx="10" fill="#0f1417" stroke="#2b3135"/>
+  <text class="hex" x="588" y="712">#116682 primary</text>
+  <text class="hex" x="812" y="712">#bde9ff container</text>
+  <text class="hex" x="588" y="832">#8bd0ef primary / dark</text>
+  <text class="hex" x="812" y="832">#0f1417 canvas / dark</text>
+  <text class="cap" x="588" y="900">Generated from one seed, #4A6572.</text>
+  <text class="cap" x="588" y="922">No hex is chosen by hand.</text>
+  <text class="num" x="1012" y="940" text-anchor="end">05</text>
+
+  <!-- 06 idea -->
+  <rect class="panel" x="1072" y="514" width="488" height="446" rx="14"/>
+  <text class="lab" x="1104" y="554">06 / Why</text>
+  <text x="1104" y="700" fill="#e6edf1" font-size="38" font-weight="600" letter-spacing="-0.8">The learner</text>
+  <text x="1104" y="748" fill="#e6edf1" font-size="38" font-weight="600" letter-spacing="-0.8">does the talking.</text>
+  <text class="cap" x="1104" y="810">So the tail points their way, not yours.</text>
+  <text class="num" x="1528" y="940" text-anchor="end">06</text>
+</svg>

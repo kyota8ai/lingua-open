@@ -54,6 +54,11 @@ the same three-beat rhythm and fixes the meaning.
 The tail sits bottom-left. A tail on the right is the convention for the app
 talking at you, and in this product the learner does the talking.
 
+[`docs/brand.svg`](docs/brand.svg) is the identity sheet: the mark, its
+construction grid, what it does to a real pixel grid at 16/24/32px, both
+lockups, and the palette. It is drawn by hand rather than generated, so it can
+go stale silently — its header comment lists what to re-check after a reseed.
+
 Two lockups, and the difference is deliberate:
 
 - **App icons** ([`public/pwa-*.png`](public), `apple-touch-icon.png`) keep the rounded-square plate, because that is the tile every platform expects

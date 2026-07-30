@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { CheckCircle, Eye, EyeSlash, Warning } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowsClockwise, CheckCircle, Eye, EyeSlash, Warning } from "@phosphor-icons/react";
 import { useSettings } from "../store/settings";
 import type { ProviderId } from "../lib/types";
-import { listModels, pickDefault, type ModelCatalog } from "../lib/models";
+import { listModels, pickDefault } from "../lib/models";
+import { voiceLabel, voicesFor } from "../lib/data/voices";
 import { Button, Field, Select } from "./ui";
 
 /**
@@ -40,26 +41,27 @@ export function ProviderSetup() {
   const settings = useSettings();
   const [showKey, setShowKey] = useState(false);
   const [checking, setChecking] = useState(false);
-  const [catalog, setCatalog] = useState<ModelCatalog | null>(null);
   const [checkError, setCheckError] = useState<{ message: string; hint?: string } | null>(null);
 
   const keyValue = settings.provider === "openai" ? settings.openaiKey : settings.geminiKey;
   const vendor = settings.provider === "openai" ? "openai" : "gemini";
+  // Cached in settings, so the pickers are there after a reload.
+  const catalog = vendor === "openai" ? settings.openaiCatalog : settings.geminiCatalog;
 
   /*
    * Asking the provider what this key can use serves two purposes: it verifies
    * the key without starting a paid session, and it replaces hardcoded model
    * IDs, which eventually stop resolving and return 404.
    */
-  async function checkKey() {
+  async function loadModels() {
     setChecking(true);
     setCheckError(null);
-    setCatalog(null);
     try {
       const found = await listModels(settings.provider, keyValue);
-      setCatalog(found);
+      const patch: Record<string, unknown> = {
+        [vendor === "openai" ? "openaiCatalog" : "geminiCatalog"]: found,
+      };
       // Only preselect where the learner has not chosen already.
-      const patch: Record<string, string> = {};
       const chosenConversation = vendor === "openai" ? settings.openaiConversationModel : settings.geminiConversationModel;
       const chosenText = vendor === "openai" ? settings.openaiTextModel : settings.geminiTextModel;
       if (!chosenConversation && found.conversation.length > 0) {
@@ -72,7 +74,7 @@ export function ProviderSetup() {
       if (!chosenText && found.text.length > 0) {
         patch[vendor === "openai" ? "openaiTextModel" : "geminiTextModel"] = pickDefault(found.text, vendor, "text");
       }
-      if (Object.keys(patch).length > 0) settings.setPartial(patch);
+      settings.setPartial(patch);
     } catch (e) {
       const err = e as { message?: string; hint?: string };
       setCheckError({ message: err.message ?? "Could not check the key.", hint: err.hint });
@@ -80,6 +82,18 @@ export function ProviderSetup() {
       setChecking(false);
     }
   }
+
+  /*
+   * Load once on arrival when there is a key but no cached list, so a learner
+   * who has entered a key never has to discover the button to get pickers.
+   */
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (autoTried.current || catalog || !keyValue || settings.provider === "demo") return;
+    autoTried.current = true;
+    void loadModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyValue, settings.provider, catalog]);
 
   return (
     <div>
@@ -163,10 +177,11 @@ export function ProviderSetup() {
           </Field>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <Button variant="secondary" size="sm" onClick={checkKey} disabled={!keyValue || checking}>
-              {checking ? "Checking..." : "Check key and load models"}
+            <Button variant="secondary" size="sm" onClick={loadModels} disabled={!keyValue || checking}>
+              {catalog && <ArrowsClockwise size={15} aria-hidden />}
+              {checking ? "Checking..." : catalog ? "Refresh models" : "Check key and load models"}
             </Button>
-            {catalog && !checkError && (
+            {catalog && !checkError && !checking && (
               <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-good">
                 <CheckCircle size={15} weight="fill" aria-hidden />
                 Key works
@@ -231,6 +246,26 @@ export function ProviderSetup() {
               )}
             </div>
           )}
+
+          <div className="mt-4">
+            <Field label="Voice" htmlFor="voice" helper="How your conversation partner sounds.">
+              <Select
+                id="voice"
+                value={settings.activeVoice()}
+                onChange={(e) =>
+                  settings.setPartial(
+                    vendor === "openai" ? { openaiVoice: e.target.value } : { geminiVoice: e.target.value },
+                  )
+                }
+              >
+                {voicesFor(vendor).map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {voiceLabel(v)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
         </div>
       )}
     </div>

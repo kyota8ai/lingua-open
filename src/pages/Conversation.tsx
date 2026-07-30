@@ -65,6 +65,7 @@ export default function Conversation() {
       isDemo ? "demo" : settings.provider,
       settings.activeKey(),
       settings.activeConversationModel(),
+      settings.activeVoice(),
     );
     providerRef.current = provider;
     try {

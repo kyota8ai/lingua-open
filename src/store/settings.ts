@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { CEFRLevel, OnboardingProfile, ProviderId } from "../lib/types";
-import { FALLBACK_MODELS } from "../lib/models";
+import { FALLBACK_MODELS, type ModelCatalog } from "../lib/models";
+import { DEFAULT_VOICES } from "../lib/data/voices";
 
-type Derived = "setPartial" | "activeKey" | "activeConversationModel" | "activeTextModel";
+type Derived = "setPartial" | "activeKey" | "activeConversationModel" | "activeTextModel" | "activeVoice";
 
 interface SettingsState {
   onboarded: boolean;
@@ -16,6 +17,11 @@ interface SettingsState {
   openaiTextModel: string;
   geminiConversationModel: string;
   geminiTextModel: string;
+  openaiVoice: string;
+  geminiVoice: string;
+  /** Cached discovery result, so the pickers survive a reload. */
+  openaiCatalog: ModelCatalog | null;
+  geminiCatalog: ModelCatalog | null;
   languageCode: string;
   dialectId: string;
   level: CEFRLevel;
@@ -26,6 +32,7 @@ interface SettingsState {
   activeKey: () => string;
   activeConversationModel: () => string;
   activeTextModel: () => string;
+  activeVoice: () => string;
 }
 
 export const useSettings = create<SettingsState>()(
@@ -39,6 +46,10 @@ export const useSettings = create<SettingsState>()(
       openaiTextModel: "",
       geminiConversationModel: "",
       geminiTextModel: "",
+      openaiVoice: "",
+      geminiVoice: "",
+      openaiCatalog: null,
+      geminiCatalog: null,
       languageCode: "ar",
       dialectId: "ar-eg",
       level: "A2",
@@ -60,6 +71,12 @@ export const useSettings = create<SettingsState>()(
         const s = get();
         if (s.provider === "openai") return s.openaiTextModel || FALLBACK_MODELS.openai.text;
         if (s.provider === "gemini") return s.geminiTextModel || FALLBACK_MODELS.gemini.text;
+        return "";
+      },
+      activeVoice: () => {
+        const s = get();
+        if (s.provider === "openai") return s.openaiVoice || DEFAULT_VOICES.openai;
+        if (s.provider === "gemini") return s.geminiVoice || DEFAULT_VOICES.gemini;
         return "";
       },
     }),

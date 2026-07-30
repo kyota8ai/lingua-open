@@ -3,6 +3,7 @@ import { ProviderError } from "./types";
 import type { PromptContext } from "../prompts";
 import { buildSystemPrompt } from "../prompts";
 import { FALLBACK_MODELS } from "../models";
+import { DEFAULT_VOICES } from "../data/voices";
 import { normalizeTranscript } from "../transcript";
 
 /**
@@ -27,6 +28,7 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
   constructor(
     private apiKey: string,
     private model: string = FALLBACK_MODELS.openai.conversation,
+    private voice: string = DEFAULT_VOICES.openai,
   ) {}
 
   async connect(ctx: PromptContext, events: ProviderEvents): Promise<void> {
@@ -74,7 +76,7 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
             instructions: buildSystemPrompt(ctx),
             audio: {
               input: { transcription: { model: "gpt-4o-mini-transcribe" }, turn_detection: { type: "semantic_vad" } },
-              output: { voice: "marin" },
+              output: { voice: this.voice },
             },
           },
         });

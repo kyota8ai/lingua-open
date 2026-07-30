@@ -3,6 +3,7 @@ import { ProviderError } from "./types";
 import type { PromptContext } from "../prompts";
 import { buildSystemPrompt } from "../prompts";
 import { FALLBACK_MODELS } from "../models";
+import { DEFAULT_VOICES } from "../data/voices";
 import { normalizeTranscript } from "../transcript";
 
 /**
@@ -24,6 +25,8 @@ export class GeminiLiveProvider implements ConversationProvider {
   private outCtx: AudioContext | null = null;
   private worklet: AudioWorkletNode | null = null;
   private playCursor = 0;
+  /** Scheduled output chunks, so a barge-in can stop exactly what is pending. */
+  private queued = new Set<AudioBufferSourceNode>();
   private muted = false;
   private closing = false;
   private events: ProviderEvents | null = null;
@@ -35,6 +38,7 @@ export class GeminiLiveProvider implements ConversationProvider {
   constructor(
     private apiKey: string,
     private model: string = FALLBACK_MODELS.gemini.conversation,
+    private voice: string = DEFAULT_VOICES.gemini,
   ) {}
 
   async connect(ctx: PromptContext, events: ProviderEvents): Promise<void> {
@@ -50,6 +54,9 @@ export class GeminiLiveProvider implements ConversationProvider {
       throw new ProviderError("Microphone access was denied.", "Allow microphone access in your browser and try again.");
     }
     this.mic = mic;
+    // Still inside the click that started the session, which is the reliable
+    // moment to get a running AudioContext rather than a suspended one.
+    this.ensureOutCtx();
 
     try {
       await new Promise<void>((resolve, reject) => {
@@ -76,7 +83,10 @@ export class GeminiLiveProvider implements ConversationProvider {
             JSON.stringify({
               setup: {
                 model: `models/${this.model}`,
-                generationConfig: { responseModalities: ["AUDIO"] },
+                generationConfig: {
+                  responseModalities: ["AUDIO"],
+                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: this.voice } } },
+                },
                 systemInstruction: { parts: [{ text: buildSystemPrompt(ctx) }] },
                 inputAudioTranscription: {},
                 outputAudioTranscription: {},
@@ -240,6 +250,8 @@ export class GeminiLiveProvider implements ConversationProvider {
       this.outCtx = new AudioContext({ sampleRate: OUT_RATE });
       this.playCursor = this.outCtx.currentTime;
     }
+    // Created during a click, but a context can still come up suspended.
+    if (this.outCtx.state === "suspended") void this.outCtx.resume();
     return this.outCtx;
   }
 
@@ -265,14 +277,27 @@ export class GeminiLiveProvider implements ConversationProvider {
     const startAt = Math.max(ctx.currentTime, this.playCursor);
     src.start(startAt);
     this.playCursor = startAt + buffer.duration;
+    this.queued.add(src);
+    src.onended = () => this.queued.delete(src);
   }
 
+  /**
+   * Barge-in: stop what is queued, as the Live API guide requires. It must not
+   * close the AudioContext. Doing that killed the opening line, because the
+   * mic is already streaming while the model produces its first turn and any
+   * room noise can trigger an interrupt.
+   */
   private flushPlayback() {
-    // Drop queued audio on barge-in: reset the schedule cursor.
-    if (this.outCtx) {
-      this.outCtx.close().catch(() => {});
-      this.outCtx = null;
+    for (const src of this.queued) {
+      try {
+        src.onended = null;
+        src.stop();
+      } catch {
+        // Already finished; nothing to stop.
+      }
     }
+    this.queued.clear();
+    if (this.outCtx) this.playCursor = this.outCtx.currentTime;
   }
 
   private sendClientText(text: string, echo: boolean) {
@@ -315,6 +340,10 @@ export class GeminiLiveProvider implements ConversationProvider {
       this.inCtx = null;
     }
     this.flushPlayback();
+    if (this.outCtx) {
+      await this.outCtx.close().catch(() => {});
+      this.outCtx = null;
+    }
     this.mic?.getTracks().forEach((t) => t.stop());
     this.mic = null;
     if (this.ws) {

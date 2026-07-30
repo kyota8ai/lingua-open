@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Practice speaking any language with AI. Your conversations never touch our servers, because we don't have any. Free with your own API key, open source."
+    />
+    <title>lingua-open · Speak freely. Literally.</title>
+    <meta name="theme-color" content="#0f766e" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F766E'/%3E%3Crect x='8' y='13' width='3' height='6' rx='1.5' fill='white'/%3E%3Crect x='14.5' y='9' width='3' height='14' rx='1.5' fill='white'/%3E%3Crect x='21' y='12' width='3' height='8' rx='1.5' fill='white'/%3E%3C/svg%3E"
+    />
+    <script>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("lingua-theme");
+        } catch (e) {}
+        var theme =
+          stored === "light" || stored === "dark"
+            ? stored
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

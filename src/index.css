@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@import "@fontsource-variable/outfit";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+  Semantic tokens. Light and dark values live on :root / [data-theme="dark"],
+  Tailwind utilities map onto them via @theme inline.
+  Rules (DESIGN.md): one accent (teal), warm stone neutrals, rose reserved for
+  live-recording states, amber for warnings. No purple, no gradients-as-decoration.
+*/
+:root {
+  --canvas: #faf9f7;
+  --surface: #ffffff;
+  --surface-sunken: #f3f1ee;
+  --ink: #1c1917;
+  --ink-muted: #57534e;
+  --ink-faint: #79716b;
+  --line: #e7e5e3;
+  --line-strong: #857d76; /* >=3:1 vs surface (WCAG 1.4.11: input/button borders) */
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --accent-soft: #e6f4f2;
+  --on-accent: #ffffff;
+  --live: #e11d48;
+  --live-strong: #be123c;
+  --on-live: #ffffff;
+  --live-soft: #fdeef2;
+  --warn: #b45309;
+  --warn-soft: #fdf3e3;
+  --good: #15803d;
+  --good-soft: #e9f6ec;
+}
+
+[data-theme="dark"] {
+  --canvas: #131211;
+  --surface: #1c1a19;
+  --surface-sunken: #171514;
+  --ink: #f4f3f1;
+  --ink-muted: #b3aca6;
+  --ink-faint: #8a837d;
+  --line: #2c2927;
+  --line-strong: #7a736c; /* >=3:1 vs surface (WCAG 1.4.11) */
+  --accent: #2fbdb0;
+  --accent-strong: #48d6c9;
+  --accent-soft: #14312e;
+  --on-accent: #08201d;
+  --live: #fb7185;
+  --live-strong: #f43f5e;
+  --on-live: #3c1a22; /* 5.7:1 on --live, 4.7:1 on --live-strong */
+  --live-soft: #3c1a22;
+  --warn: #e8a33d;
+  --warn-soft: #362a17;
+  --good: #4ade80;
+  --good-soft: #16301f;
+}
+
+@theme inline {
+  --font-sans: "Outfit Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-live: var(--live);
+  --color-live-strong: var(--live-strong);
+  --color-on-live: var(--on-live);
+  --color-live-soft: var(--live-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+
+  /* Shape system: controls 12px, containers 16px, chips pill. */
+  --radius-control: 12px;
+  --radius-card: 16px;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Learner-language text: larger, roomier, script-aware. `lang` + `dir` are set dynamically. */
+.target-lang {
+  font-family: var(--font-sans), "Noto Sans Arabic", "Noto Sans JP", "Noto Sans KR", sans-serif;
+  line-height: 1.7;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

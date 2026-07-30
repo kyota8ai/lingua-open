@@ -4,6 +4,7 @@ import { useSettings } from "../store/settings";
 import type { ProviderId } from "../lib/types";
 import { listModels, pickDefault } from "../lib/models";
 import { voiceLabel, voicesFor } from "../lib/data/voices";
+import { modelNote } from "../lib/data/modelNotes";
 import { Button, Field, Select } from "./ui";
 
 /**
@@ -47,7 +48,11 @@ export function ProviderSetup() {
   const vendor = settings.provider === "openai" ? "openai" : "gemini";
   // Cached in settings, so the pickers are there after a reload.
   const catalog = vendor === "openai" ? settings.openaiCatalog : settings.geminiCatalog;
-  const nativeAudioSelected = /native-audio/i.test(settings.activeConversationModel());
+  // Same function that preselects, so the badge can never point elsewhere.
+  const recommended = catalog && catalog.conversation.length > 0 ? pickDefault(catalog.conversation, vendor, "conversation") : null;
+  const selectedConversation = settings.activeConversationModel();
+  const nativeAudioSelected = /native-audio/i.test(selectedConversation);
+  const note = modelNote(selectedConversation);
 
   /*
    * Asking the provider what this key can use serves two purposes: it verifies
@@ -221,7 +226,7 @@ export function ProviderSetup() {
                 >
                   {catalog.conversation.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.label}
+                      {m.id === recommended ? `${m.label} (recommended)` : m.label}
                     </option>
                   ))}
                 </Select>
@@ -248,6 +253,18 @@ export function ProviderSetup() {
                   This key has no realtime voice model available. Voice conversations will not connect until the
                   provider grants access to one.
                 </p>
+              )}
+
+              {note && (
+                <div className="sm:col-span-2 rounded-(--radius-control) border border-line bg-sunken px-3.5 py-3">
+                  <p className="text-[13px] text-ink leading-relaxed">
+                    <span className="font-medium">Talking to this model costs money.</span>{" "}
+                    {note.price && <span className="font-mono text-[12px]">{note.price}. </span>}
+                    {note.monthly && <>That works out to {note.monthly}. </>}
+                    The provider bills you directly and we take no part of it.
+                  </p>
+                  {note.tradeoff && <p className="mt-1.5 text-[13px] text-warn leading-relaxed">{note.tradeoff}</p>}
+                </div>
               )}
             </div>
           )}

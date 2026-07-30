@@ -11,8 +11,8 @@ const NAV = [
 
 function navClass(isActive: boolean) {
   return [
-    "flex items-center gap-3 h-11 px-3.5 rounded-(--radius-control) text-[15px] font-medium transition-colors duration-150",
-    isActive ? "bg-accent-soft text-accent" : "text-ink-muted hover:bg-sunken hover:text-ink",
+    "flex items-center gap-3 h-12 px-4 rounded-(--radius-control) text-[15px] font-medium transition-colors duration-150",
+    isActive ? "bg-accent-soft text-on-accent-soft" : "text-ink-muted hover:bg-sunken hover:text-ink",
   ].join(" ");
 }
 
@@ -63,7 +63,7 @@ export function AppShell() {
               className={({ isActive }) =>
                 [
                   "flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
-                  isActive ? "text-accent" : "text-ink-faint",
+                  isActive ? "text-accent-text" : "text-ink-faint",
                 ].join(" ")
               }
             >

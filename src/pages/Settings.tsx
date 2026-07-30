@@ -76,7 +76,7 @@ export default function Settings() {
 
       {notice && (
         <p
-          className="mb-6 rounded-(--radius-control) border border-line bg-sunken px-4 py-3 text-[14px] text-ink"
+          className="mb-6 rounded-(--radius-field) border border-line bg-sunken px-4 py-3 text-[14px] text-ink"
           role="status"
         >
           {notice}
@@ -156,9 +156,9 @@ export default function Settings() {
                 applyTheme(id);
               }}
               className={[
-                "flex items-center gap-2 h-11 px-4 rounded-(--radius-control) border text-[14px] font-medium cursor-pointer transition-colors duration-150",
+                "state-layer flex items-center gap-2 h-11 px-4 rounded-(--radius-control) border text-[14px] font-medium cursor-pointer transition-colors duration-150",
                 settings.theme === id
-                  ? "border-accent bg-accent-soft text-ink"
+                  ? "border-accent bg-accent-soft text-on-accent-soft"
                   : "border-line bg-surface text-ink-muted hover:border-line-strong",
               ].join(" ")}
             >

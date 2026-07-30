@@ -51,7 +51,7 @@ export default function SessionDetail() {
     return (
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <p className="text-[15px] text-ink-muted">This session does not exist.</p>
-        <Link to="/history" className="text-accent font-medium hover:underline text-[15px]">
+        <Link to="/history" className="text-accent-text font-medium hover:underline text-[15px]">
           Back to history
         </Link>
       </main>
@@ -91,7 +91,7 @@ export default function SessionDetail() {
 
       <header className="mb-8">
         {fresh && (
-          <p className="inline-flex items-center gap-1.5 text-accent text-[14px] font-medium mb-2">
+          <p className="inline-flex items-center gap-1.5 text-accent-text text-[14px] font-medium mb-2">
             <CheckCircle size={17} weight="fill" aria-hidden />
             Session saved in this browser
           </p>
@@ -123,7 +123,7 @@ export default function SessionDetail() {
         {!fb && !waited && (
           <Card className="p-5">
             <div className="flex items-center gap-3">
-              <Sparkle size={20} className="text-accent animate-pulse" aria-hidden />
+              <Sparkle size={20} className="text-accent-text-text animate-pulse" aria-hidden />
               <p className="text-[15px] text-ink-muted">
                 Your AI partner is reviewing the transcript with your own key. This usually takes a few seconds.
               </p>
@@ -177,7 +177,7 @@ export default function SessionDetail() {
                     return (
                       <li
                         key={v.term}
-                        className="flex items-center justify-between gap-3 rounded-(--radius-control) border border-line bg-surface px-4 py-3"
+                        className="flex items-center justify-between gap-3 rounded-(--radius-field) border border-line bg-surface px-4 py-3"
                       >
                         <div className="min-w-0">
                           <p className="target-lang text-[16px] font-medium text-ink" lang={lang.code} dir="auto">
@@ -202,7 +202,7 @@ export default function SessionDetail() {
                   })}
                 </ul>
                 <div className="mt-4">
-                  <Link to="/review" className="text-[14px] font-medium text-accent hover:underline">
+                  <Link to="/review" className="text-[14px] font-medium text-accent-text-text hover:underline">
                     Review your vocabulary
                   </Link>
                 </div>
@@ -223,7 +223,7 @@ export default function SessionDetail() {
               key={t.id}
               className={[
                 "max-w-[85%] rounded-(--radius-card) px-4 py-3",
-                t.role === "user" ? "self-end bg-accent-soft rounded-br-md" : "self-start bg-surface border border-line rounded-bl-md",
+                t.role === "user" ? "self-end bg-accent-soft text-on-accent-soft rounded-br-md" : "self-start bg-sunken text-ink rounded-bl-md",
               ].join(" ")}
             >
               <TappableText

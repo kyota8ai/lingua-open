@@ -98,7 +98,7 @@ export default function Landing() {
             <p className="mt-6 text-[15px] text-ink-muted leading-relaxed">
               You don't have to take our word for it. The entire app is open source, so anyone in the world can verify
               every claim on this page.{" "}
-              <a href={REPO_URL} target="_blank" rel="noreferrer" className="font-medium text-accent hover:underline">
+              <a href={REPO_URL} target="_blank" rel="noreferrer" className="font-medium text-accent-text-text hover:underline">
                 And if you read code: don't trust us, read it.
               </a>
             </p>
@@ -141,7 +141,7 @@ export default function Landing() {
           {/* What a session gives you */}
           <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-4">
             <article className="rounded-(--radius-card) border border-line bg-surface p-6">
-              <ChatsCircle size={24} className="text-accent" aria-hidden />
+              <ChatsCircle size={24} className="text-accent-text" aria-hidden />
               <h3 className="mt-3 text-[18px] font-semibold">Missions, not lectures</h3>
               <p className="mt-1.5 text-[14px] text-ink-muted leading-relaxed">
                 Order at a café, survive a job interview, convince an alien commander. Each scenario gives you goal
@@ -149,7 +149,7 @@ export default function Landing() {
               </p>
             </article>
             <article className="rounded-(--radius-card) border border-line bg-surface p-6">
-              <BookOpenText size={24} className="text-accent" aria-hidden />
+              <BookOpenText size={24} className="text-accent-text" aria-hidden />
               <h3 className="mt-3 text-[18px] font-semibold">Feedback that sticks</h3>
               <p className="mt-1.5 text-[14px] text-ink-muted leading-relaxed">
                 Every session ends with corrections and vocabulary, and the vocabulary comes back on a spaced-repetition
@@ -187,7 +187,7 @@ export default function Landing() {
                 </p>
               </div>
             </div>
-            <p className="mt-5 flex items-start gap-2.5 text-[14px] leading-relaxed rounded-(--radius-control) border border-warn/40 bg-warn-soft px-4 py-3">
+            <p className="mt-5 flex items-start gap-2.5 text-[14px] leading-relaxed rounded-(--radius-field) border border-warn/40 bg-warn-soft text-on-warn-soft px-4 py-3">
               <LockKey size={17} className="shrink-0 mt-0.5 text-warn" aria-hidden />
               <span>
                 Honest note: on Gemini's free tier, Google may use conversations for training. That defeats the point,
@@ -335,7 +335,7 @@ export default function Landing() {
           <Logo />
           <p className="text-[13px] text-ink-faint">
             AGPL-3.0 · Built for learners who read privacy policies ·{" "}
-            <a href={REPO_URL} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+            <a href={REPO_URL} target="_blank" rel="noreferrer" className="text-accent-text-text hover:underline">
               Source
             </a>
           </p>
@@ -352,8 +352,8 @@ function PrivacyDiagram() {
     <figure className="mt-8" aria-label="Data flow diagram: your browser talks directly to your AI provider; no lingua-open server exists">
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-stretch gap-3">
         <div className="rounded-(--radius-card) border border-accent bg-accent-soft p-4">
-          <p className="text-[13px] font-semibold text-accent">Your browser</p>
-          <ul className="mt-2 text-[13px] text-ink leading-relaxed">
+          <p className="text-[13px] font-semibold text-on-accent-soft">Your browser</p>
+          <ul className="mt-2 text-[13px] text-on-accent-soft leading-relaxed">
             <li>conversations + transcripts</li>
             <li>vocabulary + progress</li>
             <li>your API key</li>
@@ -370,7 +370,7 @@ function PrivacyDiagram() {
           </p>
         </div>
       </div>
-      <figcaption className="mt-3 flex items-center gap-2 rounded-(--radius-control) border border-dashed border-line-strong px-4 py-2.5 text-[13px] text-ink-muted">
+      <figcaption className="mt-3 flex items-center gap-2 rounded-(--radius-field) border border-dashed border-line-strong px-4 py-2.5 text-[13px] text-ink-muted">
         <Prohibit size={16} className="shrink-0" aria-hidden />
         lingua-open servers: none exist. Nothing to breach, subpoena or train on.
       </figcaption>
@@ -419,7 +419,7 @@ function DemoLoop() {
             key={i}
             className={[
               "max-w-[88%] rounded-(--radius-card) px-3.5 py-2.5",
-              t.role === "user" ? "self-end bg-accent-soft rounded-br-md" : "self-start bg-canvas border border-line rounded-bl-md",
+              t.role === "user" ? "self-end bg-accent-soft text-on-accent-soft rounded-br-md" : "self-start bg-sunken text-ink rounded-bl-md",
             ].join(" ")}
           >
             <p className="target-lang text-[15px]" lang="ar" dir="auto">
@@ -431,7 +431,7 @@ function DemoLoop() {
       </div>
       <div className="px-4 py-3 border-t border-line bg-sunken">
         <p className="text-[12px] text-ink-muted">
-          The real interface, replaying a session. <Link to="/welcome" className="font-medium text-accent hover:underline">Try it live in demo mode</Link>, no key needed.
+          The real interface, replaying a session. <Link to="/welcome" className="font-medium text-accent-text-text hover:underline">Try it live in demo mode</Link>, no key needed.
         </p>
       </div>
     </div>

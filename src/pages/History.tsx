@@ -35,7 +35,7 @@ export default function History() {
               <div className="mt-1 flex items-baseline justify-between gap-3">
                 <p className="font-mono text-2xl font-medium text-ink">{dueCount}</p>
                 {dueCount > 0 && (
-                  <Link to="/review" className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline">
+                  <Link to="/review" className="inline-flex items-center gap-1 text-[13px] font-medium text-accent-text-text hover:underline">
                     <StackSimple size={14} aria-hidden />
                     Review now
                   </Link>

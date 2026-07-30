@@ -7,16 +7,47 @@ styling (purple gradients, neon glows).
 
 Dials: variance 5, motion 4, density 4. Restrained, not static.
 
-## Tokens
+## Color
 
-Defined in [`src/index.css`](src/index.css) as CSS custom properties, exposed to
-Tailwind via `@theme inline`. Never hardcode a color in a component.
+Color is Material 3. No hex value is chosen by hand anywhere in the app.
 
-- **Neutrals** are warm stone. Light: `#FAF9F7` canvas on white surfaces. Dark: `#131211` canvas on `#1C1A19` surfaces. No pure black or pure white
-- **One accent**, teal (`#0F766E` light, `#2FBDB0` dark), locked across the whole app. No secondary accent
-- **Semantic colors** are reserved: `live` (rose) only for recording and in-call states, `warn` (amber) for honest warnings such as the Gemini free-tier notice, `good` (green) for correct and complete. Never convey meaning by color alone; always pair with an icon or text
+[`scripts/gen-theme.mjs`](scripts/gen-theme.mjs) generates every color token in
+[`src/theme.css`](src/theme.css) from a single seed, `#4A6572` (slate blue-grey),
+using Google's `material-color-utilities`. To change the palette, change the seed
+and re-run it:
+
+```
+npx vite-node -c scripts/vite.theme.config.mjs scripts/gen-theme.mjs
+```
+
+`src/theme.css` is generated output. Edit the script, never the CSS.
+
+Three decisions in that script are load-bearing:
+
+- **`SchemeTonalSpot`, not `SchemeContent`.** Content pins `primary-container` to the seed itself in both themes, so every filled area lands as dark as the seed and light mode stops being light. TonalSpot places containers at tone 90 in light and tone 30 in dark, so a fill stays pale in light mode and its paired text is comfortably readable. The seed then contributes only the hue
+- **Status colors are not derived from the seed.** M3 builds `tertiary` by rotating the seed hue, which from this seed lands on purple, and a purple warning reads as decoration rather than as a warning. `warning` (amber) and `success` (green) are generated from their own fixed hues at M3's own tone assignments; `error` already ships fixed
+- **A third text tone.** M3 stops at `on-surface-variant`, so the faintest text was borrowing `outline`, a role meant for borders and too light to read as body text. `on-surface-faint` sits one step below `on-surface-variant` and still clears 4.5:1 on every surface the app uses
+
+[`src/index.css`](src/index.css) is a thin alias layer over the `md-sys` roles
+(`--accent`, `--ink`, `--surface`, …) so components read as what they mean and a
+reseed changes every screen at once. Components use only these aliases; never a
+hex value, and never a raw `md-sys` role.
+
+**Every fill has a partner.** Put a fill on the background and its `on-` partner
+on the text. Reaching for `--ink` on top of a tinted fill is what once made the
+Gemini warning banner invisible: it survives one theme by luck and disappears in
+the other. Depth follows M3 too — a container's tone carries elevation, not a
+shadow — and hover/press are the M3 state layer (`.state-layer`, a wash of the
+content color at 0.08 / 0.12), not a per-component hover color.
+
+Contrast is verified, not assumed: every fill/text pair clears WCAG AA in both
+themes.
+
+## Other tokens
+
 - **Type**: Outfit Variable for UI, JetBrains Mono for numbers, timers, API keys and costs. Learner-language text uses `.target-lang` with looser leading, script-aware fallbacks, and `lang` / `dir="auto"` so right-to-left and CJK render correctly
-- **Shape lock**: 12px for controls, 16px for containers, full pill for chips. Do not mix other radii
+- **Shape scale**: `--radius-control` pill for buttons and chips, `--radius-field` 8px for inputs, `--radius-card` 12px for cards, `--radius-sheet` 28px for dialogs and sheets. Do not mix other radii
+- **Meaning is never carried by color alone.** `live` marks recording and in-call states, `warn` honest warnings such as the Gemini free-tier notice, `good` correct and complete — each always paired with an icon or text
 
 ## Screen rules
 

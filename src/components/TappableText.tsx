@@ -79,7 +79,7 @@ export function TappableText({ text, langCode, langLabel, provider, apiKey, text
       </p>
 
       {panel && (
-        <div className="mt-2 flex items-start justify-between gap-3 rounded-(--radius-control) bg-sunken border border-line px-3 py-2 text-left">
+        <div className="mt-2 flex items-start justify-between gap-3 rounded-(--radius-field) bg-sunken border border-line px-3 py-2 text-left">
           <div className="min-w-0 text-[13px] leading-snug">
             <span className="target-lang font-medium text-ink" lang={langCode} dir="auto">
               {panel.term}
@@ -105,7 +105,7 @@ export function TappableText({ text, langCode, langLabel, provider, apiKey, text
                 <button
                   type="button"
                   onClick={save}
-                  className="inline-flex items-center gap-1 min-h-8 px-2 rounded-[8px] text-[12px] font-medium text-accent hover:bg-accent-soft cursor-pointer"
+                  className="inline-flex items-center gap-1 min-h-8 px-2 rounded-[8px] text-[12px] font-medium text-accent-text hover:bg-accent-soft cursor-pointer"
                 >
                   <BookmarkSimple size={14} aria-hidden />
                   Save

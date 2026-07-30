@@ -189,7 +189,7 @@ export default function Conversation() {
                 {scenario.goalPhrases.map((p) => (
                   <li
                     key={p}
-                    className="px-4 py-2.5 rounded-(--radius-control) bg-surface border border-line text-[15px] text-ink"
+                    className="px-4 py-2.5 rounded-(--radius-field) bg-surface border border-line text-[15px] text-ink"
                   >
                     {p}
                   </li>
@@ -305,8 +305,8 @@ export default function Conversation() {
             )}
             {session.error && (
               <div className="rounded-(--radius-card) border border-live/40 bg-live-soft p-4" role="alert">
-                <p className="text-[15px] font-medium text-ink">{session.error}</p>
-                {session.errorHint && <p className="mt-1 text-[13px] text-ink-muted">{session.errorHint}</p>}
+                <p className="text-[15px] font-medium text-on-live-soft">{session.error}</p>
+                {session.errorHint && <p className="mt-1 text-[13px] text-on-live-soft/80">{session.errorHint}</p>}
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" onClick={begin}>Try again</Button>
                   <Button size="sm" variant="secondary" onClick={() => nav("/settings")}>
@@ -321,8 +321,8 @@ export default function Conversation() {
                 className={[
                   "max-w-[85%] rounded-(--radius-card) px-4 py-3",
                   t.role === "user"
-                    ? "self-end bg-accent-soft text-ink rounded-br-md"
-                    : "self-start bg-surface border border-line text-ink rounded-bl-md",
+                    ? "self-end bg-accent-soft text-on-accent-soft rounded-br-md"
+                    : "self-start bg-sunken text-ink rounded-bl-md",
                   t.pending ? "opacity-80" : "",
                 ].join(" ")}
               >
@@ -413,7 +413,7 @@ export default function Conversation() {
               onChange={(e) => setTextInput(e.target.value)}
               placeholder={isDemo ? "Type your reply (demo mode)" : "Type instead of speaking"}
               autoComplete="off"
-              className="flex-1 h-11 px-3.5 rounded-(--radius-control) bg-canvas border border-line-strong text-[15px] placeholder:text-ink-faint focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0"
+              className="flex-1 h-12 px-5 rounded-(--radius-control) bg-sunken border border-transparent text-[15px] text-ink placeholder:text-ink-faint focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0"
               disabled={!live}
             />
             <Button type="submit" variant="secondary" disabled={!live || !textInput.trim()} aria-label="Send text">
@@ -483,7 +483,7 @@ function TaskChecklist({
               type="button"
               onClick={() => onToggle(i)}
               aria-pressed={isDone}
-              className="flex items-start gap-2.5 w-full text-left px-2 py-2 rounded-(--radius-control) hover:bg-sunken cursor-pointer transition-colors"
+              className="flex items-start gap-2.5 w-full text-left px-2 py-2 rounded-(--radius-field) hover:bg-sunken cursor-pointer transition-colors"
             >
               {isDone ? (
                 <CheckCircle size={18} weight="fill" className="shrink-0 mt-0.5 text-good" aria-hidden />

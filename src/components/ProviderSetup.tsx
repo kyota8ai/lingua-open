@@ -113,8 +113,8 @@ export function ProviderSetup() {
             aria-pressed={settings.provider === o.id}
             onClick={() => settings.setPartial({ provider: o.id })}
             className={[
-              "flex items-center justify-between gap-3 min-h-14 px-4 py-3 rounded-(--radius-control) border text-left cursor-pointer transition-colors duration-150",
-              settings.provider === o.id ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-line-strong",
+              "flex items-center justify-between gap-3 min-h-14 px-4 py-3 rounded-(--radius-field) border text-left cursor-pointer transition-colors duration-150",
+              settings.provider === o.id ? "border-accent bg-accent-soft text-on-accent-soft" : "border-line bg-surface hover:border-line-strong",
             ].join(" ")}
           >
             <span>
@@ -131,9 +131,9 @@ export function ProviderSetup() {
       </p>
 
       {settings.provider === "gemini" && (
-        <div className="mt-4 flex items-start gap-2.5 rounded-(--radius-control) border border-warn/40 bg-warn-soft px-3.5 py-3">
+        <div className="mt-4 flex items-start gap-2.5 rounded-(--radius-field) border border-warn/40 bg-warn-soft px-3.5 py-3">
           <Warning size={18} className="shrink-0 mt-0.5 text-warn" aria-hidden />
-          <p className="text-[13px] leading-relaxed text-ink">
+          <p className="text-[13px] leading-relaxed text-on-warn-soft">
             <strong>Honest warning:</strong> on Gemini's free tier, Google may use your conversations to train its
             models. That defeats the point of this app. Use a paid-tier key, where Google states data is not used for
             training.
@@ -169,13 +169,13 @@ export function ProviderSetup() {
                 placeholder={settings.provider === "openai" ? "sk-..." : "AIza..."}
                 autoComplete="off"
                 spellCheck={false}
-                className="h-11 w-full pl-3.5 pr-12 rounded-(--radius-control) bg-surface border border-line-strong font-mono text-[14px] text-ink placeholder:text-ink-faint focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0 focus-visible:border-accent"
+                className="h-11 w-full pl-3.5 pr-12 rounded-(--radius-field) bg-surface border border-line-strong font-mono text-[14px] text-ink placeholder:text-ink-faint focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0 focus-visible:border-accent"
               />
               <button
                 type="button"
                 onClick={() => setShowKey((v) => !v)}
                 aria-label={showKey ? "Hide API key" : "Show API key"}
-                className="absolute right-0 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-(--radius-control) text-ink-faint hover:text-ink cursor-pointer"
+                className="state-layer absolute right-1 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-(--radius-control) text-ink-muted cursor-pointer"
               >
                 {showKey ? <EyeSlash size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
               </button>
@@ -256,7 +256,7 @@ export function ProviderSetup() {
               )}
 
               {note && (
-                <div className="sm:col-span-2 rounded-(--radius-control) border border-line bg-sunken px-3.5 py-3">
+                <div className="sm:col-span-2 rounded-(--radius-field) border border-line bg-sunken px-3.5 py-3">
                   <p className="text-[13px] text-ink leading-relaxed">
                     <span className="font-medium">Talking to this model costs money.</span>{" "}
                     {note.price && <span className="font-mono text-[12px]">{note.price}. </span>}

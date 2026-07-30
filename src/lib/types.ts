@@ -26,7 +26,7 @@ export interface Language {
   dialects: DialectPreset[];
 }
 
-export type ScenarioCategory = "daily" | "work" | "travel" | "fun";
+export type ScenarioCategory = "daily" | "work" | "travel" | "debate" | "character" | "fun";
 
 export interface Scenario {
   id: string;

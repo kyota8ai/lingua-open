@@ -8,16 +8,20 @@ function cx(...parts: Array<string | false | undefined>) {
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
+/*
+ * M3 buttons: pill shape, and hover/press expressed as a state layer of the
+ * content colour rather than a second background colour per variant.
+ */
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 font-medium rounded-(--radius-control) transition-colors duration-150 cursor-pointer select-none " +
-  "focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 " +
-  "active:translate-y-px disabled:opacity-45 disabled:cursor-not-allowed disabled:active:translate-y-0";
+  "state-layer inline-flex items-center justify-center gap-2 font-medium rounded-(--radius-control) cursor-pointer select-none " +
+  "transition-[background-color,border-color] duration-150 ease-(--ease-emphasized) " +
+  "disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-on-accent hover:bg-accent-strong",
-  secondary: "bg-surface text-ink border border-line-strong hover:border-ink",
-  ghost: "text-ink-muted hover:bg-sunken hover:text-ink",
-  danger: "bg-live text-on-live hover:bg-live-strong",
+  primary: "bg-accent text-on-accent",
+  secondary: "text-accent-text border border-line-strong",
+  ghost: "text-accent-text",
+  danger: "bg-live text-on-live",
 };
 
 /* 44px touch-target floor (DESIGN.md): every size is at least h-11. */
@@ -91,8 +95,8 @@ export function Modal({
       }}
       className={
         variant === "center"
-          ? "m-auto w-[calc(100%-2rem)] max-w-sm rounded-(--radius-card) bg-surface text-ink border border-line p-0 backdrop:bg-black/50"
-          : "m-0 mt-auto w-full max-w-full rounded-t-(--radius-card) bg-surface text-ink border-t border-line p-0 backdrop:bg-black/50"
+          ? "m-auto w-[calc(100%-2rem)] max-w-sm rounded-(--radius-sheet) bg-raised text-ink border border-line p-0 backdrop:bg-black/50"
+          : "m-0 mt-auto w-full max-w-full rounded-t-(--radius-sheet) bg-raised text-ink border-t border-line p-0 backdrop:bg-black/50"
       }
     >
       <div className={variant === "center" ? "p-6" : "p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"}>
@@ -141,8 +145,8 @@ export function TextInput({ className, ...props }: InputHTMLAttributes<HTMLInput
   return (
     <input
       className={cx(
-        "h-11 px-3.5 rounded-(--radius-control) bg-surface border border-line-strong text-[15px] text-ink",
-        "placeholder:text-ink-faint focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0 focus-visible:border-accent",
+        "h-12 px-4 rounded-(--radius-field) bg-surface border border-line-strong text-[15px] text-ink",
+        "placeholder:text-ink-faint focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0",
         className,
       )}
       {...props}
@@ -154,8 +158,8 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
   return (
     <select
       className={cx(
-        "h-11 px-3 rounded-(--radius-control) bg-surface border border-line-strong text-[15px] text-ink cursor-pointer",
-        "focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0 focus-visible:border-accent",
+        "h-12 px-4 rounded-(--radius-field) bg-surface border border-line-strong text-[15px] text-ink cursor-pointer",
+        "focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-0",
         className,
       )}
       {...props}
@@ -180,9 +184,11 @@ export function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cx(
-        "h-11 px-4 rounded-full text-sm font-medium transition-colors duration-150 cursor-pointer",
-        "focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2",
-        active ? "bg-accent text-on-accent" : "bg-sunken text-ink-muted hover:text-ink border border-line",
+        "state-layer h-10 px-4 rounded-(--radius-field) text-sm font-medium cursor-pointer",
+        "transition-[background-color,border-color] duration-150 ease-(--ease-emphasized)",
+        active
+          ? "bg-accent-soft text-on-accent-soft border border-transparent"
+          : "text-ink-muted border border-line",
       )}
     >
       {children}
@@ -199,10 +205,10 @@ export function Badge({
 }) {
   const tones = {
     neutral: "bg-sunken text-ink-muted",
-    accent: "bg-accent-soft text-accent",
-    warn: "bg-warn-soft text-warn",
-    good: "bg-good-soft text-good",
-    live: "bg-live-soft text-live",
+    accent: "bg-accent-soft text-on-accent-soft",
+    warn: "bg-warn-soft text-on-warn-soft",
+    good: "bg-good-soft text-on-good-soft",
+    live: "bg-live-soft text-on-live-soft",
   };
   return (
     <span className={cx("inline-flex items-center gap-1 h-6 px-2.5 rounded-full text-xs font-medium", tones[tone])}>
@@ -235,7 +241,7 @@ export function EmptyState({
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cx("animate-pulse bg-sunken rounded-(--radius-control)", className)} aria-hidden />;
+  return <div className={cx("animate-pulse bg-sunken rounded-(--radius-card)", className)} aria-hidden />;
 }
 
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {

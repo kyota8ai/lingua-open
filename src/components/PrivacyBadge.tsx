@@ -20,7 +20,7 @@ export function PrivacyBadge() {
         href={REPO_URL}
         target="_blank"
         rel="noreferrer"
-        className="mt-2 inline-block text-xs font-medium text-accent hover:underline"
+        className="mt-2 inline-block text-xs font-medium text-accent-text-text hover:underline"
       >
         Verify it in the source
       </a>

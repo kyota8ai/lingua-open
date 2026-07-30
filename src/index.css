@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./theme.css";
 @import "@fontsource-variable/outfit";
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
@@ -6,56 +7,60 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
-  Semantic tokens. Light and dark values live on :root / [data-theme="dark"],
-  Tailwind utilities map onto them via @theme inline.
-  Rules (DESIGN.md): one accent (teal), warm stone neutrals, rose reserved for
-  live-recording states, amber for warnings. No purple, no gradients-as-decoration.
-*/
+ * Colour comes from Material 3 (theme.css, generated from one seed). The
+ * app-level names below are a thin alias layer over the md-sys roles, so
+ * components read as what they mean rather than as raw roles, and a reseed
+ * changes every screen at once.
+ *
+ * Depth follows M3: a container's tone carries elevation, not a shadow.
+ */
 :root {
-  --canvas: #faf9f7;
-  --surface: #ffffff;
-  --surface-sunken: #f3f1ee;
-  --ink: #1c1917;
-  --ink-muted: #57534e;
-  --ink-faint: #79716b;
-  --line: #e7e5e3;
-  --line-strong: #857d76; /* >=3:1 vs surface (WCAG 1.4.11: input/button borders) */
-  --accent: #0f766e;
-  --accent-strong: #115e59;
-  --accent-soft: #e6f4f2;
-  --on-accent: #ffffff;
-  --live: #e11d48;
-  --live-strong: #be123c;
-  --on-live: #ffffff;
-  --live-soft: #fdeef2;
-  --warn: #b45309;
-  --warn-soft: #fdf3e3;
-  --good: #15803d;
-  --good-soft: #e9f6ec;
+  --canvas: var(--md-sys-color-surface);
+  --surface: var(--md-sys-color-surface-container-lowest);
+  /* One step above `container` so the assistant bubble stays distinct from the
+     card behind it, which `container` alone did not manage in dark mode. */
+  --surface-sunken: var(--md-sys-color-surface-container-high);
+  --surface-raised: var(--md-sys-color-surface-container-high);
+  --ink: var(--md-sys-color-on-surface);
+  --ink-muted: var(--md-sys-color-on-surface-variant);
+  --ink-faint: var(--md-sys-color-on-surface-faint);
+  --line: var(--md-sys-color-outline-variant);
+  --line-strong: var(--md-sys-color-outline);
+  /*
+   * Every filled colour comes in a pair. Put the fill on the background and its
+   * `on-` partner on the text, and contrast holds in both themes; reach for
+   * --ink on top of a fill instead and it goes unreadable the moment the tones
+   * move, which is exactly how the warning banner became invisible.
+   *
+   *   accent        emphatic fills (hero, primary buttons, active nav)
+   *   accent-quiet  the same idea one step back (secondary fills, banners)
+   *   accent-text   text and icons sitting directly on a page surface
+   *   accent-soft   subtle tonal fills (chat bubbles, selected rows)
+   */
+  --accent: var(--md-sys-color-primary-container);
+  --on-accent: var(--md-sys-color-on-primary-container);
+  --accent-quiet: var(--md-sys-color-secondary-container);
+  --on-accent-quiet: var(--md-sys-color-on-secondary-container);
+  --accent-text: var(--md-sys-color-primary);
+  --accent-soft: var(--md-sys-color-secondary-container);
+  --on-accent-soft: var(--md-sys-color-on-secondary-container);
+  --live: var(--md-sys-color-error);
+  --live-strong: var(--md-sys-color-on-error-container);
+  --on-live: var(--md-sys-color-on-error);
+  --live-soft: var(--md-sys-color-error-container);
+  --on-live-soft: var(--md-sys-color-on-error-container);
+  --warn: var(--md-sys-color-warning);
+  --warn-soft: var(--md-sys-color-warning-container);
+  --on-warn-soft: var(--md-sys-color-on-warning-container);
+  --good: var(--md-sys-color-success);
+  --good-soft: var(--md-sys-color-success-container);
+  --on-good-soft: var(--md-sys-color-on-success-container);
 }
 
-[data-theme="dark"] {
-  --canvas: #131211;
-  --surface: #1c1a19;
-  --surface-sunken: #171514;
-  --ink: #f4f3f1;
-  --ink-muted: #b3aca6;
-  --ink-faint: #8a837d;
-  --line: #2c2927;
-  --line-strong: #7a736c; /* >=3:1 vs surface (WCAG 1.4.11) */
-  --accent: #2fbdb0;
-  --accent-strong: #48d6c9;
-  --accent-soft: #14312e;
-  --on-accent: #08201d;
-  --live: #fb7185;
-  --live-strong: #f43f5e;
-  --on-live: #3c1a22; /* 5.7:1 on --live, 4.7:1 on --live-strong */
-  --live-soft: #3c1a22;
-  --warn: #e8a33d;
-  --warn-soft: #362a17;
-  --good: #4ade80;
-  --good-soft: #16301f;
-}
+/*
+ * Dark mode needs no second alias block: theme.css swaps the md-sys values
+ * under [data-theme="dark"] and every alias follows.
+ */
 
 @theme inline {
   --font-sans: "Outfit Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -64,27 +69,40 @@
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-sunken: var(--surface-sunken);
+  --color-raised: var(--surface-raised);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
+  --color-accent-quiet: var(--accent-quiet);
+  --color-accent-text: var(--accent-text);
   --color-accent-soft: var(--accent-soft);
   --color-on-accent: var(--on-accent);
+  --color-on-accent-quiet: var(--on-accent-quiet);
+  --color-on-accent-soft: var(--on-accent-soft);
   --color-live: var(--live);
   --color-live-strong: var(--live-strong);
   --color-on-live: var(--on-live);
   --color-live-soft: var(--live-soft);
+  --color-on-live-soft: var(--on-live-soft);
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
+  --color-on-warn-soft: var(--on-warn-soft);
   --color-good: var(--good);
   --color-good-soft: var(--good-soft);
+  --color-on-good-soft: var(--on-good-soft);
 
-  /* Shape system: controls 12px, containers 16px, chips pill. */
-  --radius-control: 12px;
-  --radius-card: 16px;
+  /* M3 shape scale: controls are pill, containers use the corner tokens. */
+  --radius-control: 9999px;
+  --radius-field: 8px;
+  --radius-card: 12px;
+  --radius-sheet: 28px;
+
+  /* M3 transitions: emphasized for anything the eye follows. */
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
 }
 
 html {
@@ -108,13 +126,39 @@ body {
   line-height: 1.7;
 }
 
+/*
+ * M3 state layer: hover and press are a translucent wash of the content
+ * colour over the container, which keeps every surface consistent instead of
+ * each component inventing its own hover colour.
+ */
+.state-layer {
+  position: relative;
+  isolation: isolate;
+}
+.state-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 150ms var(--ease-emphasized);
+  pointer-events: none;
+}
+.state-layer:hover::after {
+  opacity: 0.08;
+}
+.state-layer:active::after {
+  opacity: 0.12;
+}
+
 ::selection {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 

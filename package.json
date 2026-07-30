@@ -24,6 +24,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@material/material-color-utilities": "^0.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

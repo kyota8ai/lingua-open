@@ -14,6 +14,8 @@ const CATEGORIES: Array<{ id: ScenarioCategory | "all"; label: string }> = [
   { id: "daily", label: "Daily life" },
   { id: "work", label: "Work" },
   { id: "travel", label: "Travel" },
+  { id: "debate", label: "Debate" },
+  { id: "character", label: "Characters" },
   { id: "fun", label: "Just fun" },
 ];
 
@@ -78,7 +80,7 @@ export default function Home() {
 
       <Link
         to={`/talk/${FREE_TALK.id}`}
-        className="group flex items-center justify-between gap-4 rounded-(--radius-card) bg-accent text-on-accent p-5 sm:p-6 mb-8 transition-transform duration-150 active:translate-y-px focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+        className="state-layer group flex items-center justify-between gap-4 rounded-(--radius-card) bg-accent text-on-accent p-5 sm:p-6 mb-8"
       >
         <div>
           <h2 className="text-lg font-semibold">Free talk</h2>
@@ -117,7 +119,7 @@ function ScenarioCard({ scenario }: { scenario: Scenario }) {
       <p className="mt-1.5 text-[14px] text-ink-muted leading-relaxed">{scenario.description}</p>
       <div className="mt-auto pt-4 flex items-center justify-between text-[13px] text-ink-faint">
         <span className="font-mono">{scenario.minutes} min</span>
-        <span className="inline-flex items-center gap-1 font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <span className="inline-flex items-center gap-1 font-medium text-accent-text opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Start
           <ArrowRight size={14} aria-hidden />
         </span>

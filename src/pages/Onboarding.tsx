@@ -59,7 +59,7 @@ export default function Onboarding() {
             {steps.map((label, i) => (
               <div key={label} className="flex-1">
                 <div className={["h-1 rounded-full", i <= step ? "bg-accent" : "bg-line"].join(" ")} aria-hidden />
-                <span className={["mt-1.5 block text-[11px] font-medium", i <= step ? "text-accent" : "text-ink-faint"].join(" ")}>
+                <span className={["mt-1.5 block text-[11px] font-medium", i <= step ? "text-accent-text" : "text-ink-faint"].join(" ")}>
                   {label}
                 </span>
               </div>
@@ -86,9 +86,9 @@ export default function Onboarding() {
                   }}
                   aria-pressed={languageCode === l.code}
                   className={[
-                    "flex items-center justify-between gap-2 h-12 px-4 rounded-(--radius-control) border text-[15px] font-medium cursor-pointer transition-colors duration-150",
+                    "flex items-center justify-between gap-2 h-12 px-4 rounded-(--radius-field) border text-[15px] font-medium cursor-pointer transition-colors duration-150",
                     languageCode === l.code
-                      ? "border-accent bg-accent-soft text-ink"
+                      ? "border-accent bg-accent-soft text-on-accent-soft"
                       : "border-line bg-surface text-ink-muted hover:border-line-strong",
                   ].join(" ")}
                 >
@@ -109,9 +109,9 @@ export default function Onboarding() {
                   onClick={() => setDialectId(d.id)}
                   aria-pressed={dialectId === d.id}
                   className={[
-                    "flex items-center justify-between gap-3 min-h-12 px-4 py-2.5 rounded-(--radius-control) border text-left cursor-pointer transition-colors duration-150",
+                    "flex items-center justify-between gap-3 min-h-12 px-4 py-2.5 rounded-(--radius-field) border text-left cursor-pointer transition-colors duration-150",
                     dialectId === d.id
-                      ? "border-accent bg-accent-soft"
+                      ? "border-accent bg-accent-soft text-on-accent-soft"
                       : "border-line bg-surface hover:border-line-strong",
                   ].join(" ")}
                 >
@@ -148,8 +148,8 @@ export default function Onboarding() {
                   onClick={() => setLevel(l.id)}
                   aria-pressed={level === l.id}
                   className={[
-                    "flex items-center justify-between gap-3 min-h-14 px-4 py-3 rounded-(--radius-control) border text-left cursor-pointer transition-colors duration-150",
-                    level === l.id ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-line-strong",
+                    "flex items-center justify-between gap-3 min-h-14 px-4 py-3 rounded-(--radius-field) border text-left cursor-pointer transition-colors duration-150",
+                    level === l.id ? "border-accent bg-accent-soft text-on-accent-soft" : "border-line bg-surface hover:border-line-strong",
                   ].join(" ")}
                 >
                   <span>
@@ -180,8 +180,8 @@ export default function Onboarding() {
                   onClick={() => setGoal(g.id)}
                   aria-pressed={goal === g.id}
                   className={[
-                    "h-12 px-4 rounded-(--radius-control) border text-[15px] font-medium cursor-pointer transition-colors duration-150",
-                    goal === g.id ? "border-accent bg-accent-soft text-ink" : "border-line bg-surface text-ink-muted hover:border-line-strong",
+                    "h-12 px-4 rounded-(--radius-field) border text-[15px] font-medium cursor-pointer transition-colors duration-150",
+                    goal === g.id ? "border-accent bg-accent-soft text-on-accent-soft" : "border-line bg-surface text-ink-muted hover:border-line-strong",
                   ].join(" ")}
                 >
                   {g.label}
@@ -215,7 +215,7 @@ export default function Onboarding() {
             <p className="text-[15px] text-ink-muted mb-2">
               lingua-open is free software. You bring the AI: your own API key, billed by the provider at cost.
             </p>
-            <p className="flex items-start gap-2 text-[13px] text-ink-muted bg-sunken border border-line rounded-(--radius-control) px-3.5 py-2.5 mb-6">
+            <p className="flex items-start gap-2 text-[13px] text-ink-muted bg-sunken border border-line rounded-(--radius-field) px-3.5 py-2.5 mb-6">
               <LockKey size={16} className="shrink-0 mt-0.5" aria-hidden />
               <span>
                 The key is stored in this browser only and sent only to the provider you choose. No account, no middleman.

@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router";
 import { CardsThree, ClockCounterClockwise, GearSix, StackSimple } from "@phosphor-icons/react";
 import { PrivacyBadge } from "./PrivacyBadge";
+import { Logo } from "./Logo";
 
 const NAV = [
   { to: "/", label: "Practice", icon: CardsThree, end: true },
@@ -22,14 +23,7 @@ export function AppShell() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col gap-1 border-r border-line bg-surface px-4 py-6 sticky top-0 h-dvh">
         <a href="/" className="flex items-center gap-2.5 px-2 mb-6" aria-label="lingua-open home">
-          <span className="grid place-items-center size-8 rounded-[10px] bg-accent" aria-hidden>
-            <span className="flex items-end gap-[3px]" aria-hidden>
-              <span className="w-[3px] h-2 rounded-full bg-on-accent" />
-              <span className="w-[3px] h-3.5 rounded-full bg-on-accent" />
-              <span className="w-[3px] h-2.5 rounded-full bg-on-accent" />
-            </span>
-          </span>
-          <span className="text-[17px] font-semibold tracking-tight text-ink">lingua-open</span>
+          <Logo className="text-ink" />
         </a>
         <nav aria-label="Main" className="flex flex-col gap-1">
           {NAV.map(({ to, label, icon: Icon, end }) => (

@@ -12,27 +12,13 @@ import {
 } from "@phosphor-icons/react";
 import { REPO_URL } from "../lib/constants";
 import { buttonClasses } from "../components/ui";
+import { Logo } from "../components/Logo";
 
 /*
  * Marketing page for non-onboarded visitors. Copy order is the documented
  * positioning: empathy -> structure -> verifiability. Honesty
  * rule applies to every claim: the subject is always "we".
  */
-
-function Logo() {
-  return (
-    <span className="flex items-center gap-2.5">
-      <span className="grid place-items-center size-8 rounded-[10px] bg-accent" aria-hidden>
-        <span className="flex items-end gap-[3px]">
-          <span className="w-[3px] h-2 rounded-full bg-on-accent" />
-          <span className="w-[3px] h-3.5 rounded-full bg-on-accent" />
-          <span className="w-[3px] h-2.5 rounded-full bg-on-accent" />
-        </span>
-      </span>
-      <span className="text-[17px] font-semibold tracking-tight text-ink">lingua-open</span>
-    </span>
-  );
-}
 
 export default function Landing() {
   return (

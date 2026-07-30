@@ -43,6 +43,22 @@ content color at 0.08 / 0.12), not a per-component hover color.
 Contrast is verified, not assumed: every fill/text pair clears WCAG AA in both
 themes.
 
+## Logo
+
+The mark is a speech bubble with the voice cut out of it, defined once in
+[`src/components/Logo.tsx`](src/components/Logo.tsx) as a single `evenodd` path
+in `currentColor`. It was three bars on their own, which reads as an equaliser
+or a bar chart: it says "audio levels", not "someone speaking". The bubble keeps
+the same three-beat rhythm and fixes the meaning.
+
+The tail sits bottom-left. A tail on the right is the convention for the app
+talking at you, and in this product the learner does the talking.
+
+Two lockups, and the difference is deliberate:
+
+- **App icons** ([`public/pwa-*.png`](public), `apple-touch-icon.png`) keep the rounded-square plate, because that is the tile every platform expects
+- **The favicon** ([`public/favicon.svg`](public/favicon.svg)) drops the plate. A tab already supplies the container, so losing it gives the mark about 40% more area, which is what keeps the three bars separable at 16px. It also carries a `prefers-color-scheme` rule so the mark uses light or dark `primary`
+
 ## Other tokens
 
 - **Type**: Outfit Variable for UI, JetBrains Mono for numbers, timers, API keys and costs. Learner-language text uses `.target-lang` with looser leading, script-aware fallbacks, and `lang` / `dir="auto"` so right-to-left and CJK render correctly

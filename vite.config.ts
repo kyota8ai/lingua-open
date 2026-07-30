@@ -50,8 +50,8 @@ export default defineConfig({
         short_name: "lingua-open",
         description:
           "Privacy-first AI language speaking practice. Your key, your data, no servers.",
-        theme_color: "#0f766e",
-        background_color: "#faf9f7",
+        theme_color: "#f6fafd",
+        background_color: "#f6fafd",
         display: "standalone",
         icons: [
           { src: "/pwa-192.png", sizes: "192x192", type: "image/png" },

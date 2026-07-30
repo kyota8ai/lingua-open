@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="lingua-open">
+  <!--
+    No rounded-square plate here, unlike the app icons. A tab already provides
+    the container, so dropping the plate gives the mark about 40% more area and
+    keeps the three bars separable down to 16px, where the plated version
+    turns to mush.
+
+    The fills are the light and dark `primary` from the generated theme, so a
+    reseed should update them too.
+  -->
+  <style>
+    path { fill: #116682 }
+    @media (prefers-color-scheme: dark) { path { fill: #8bd0ef } }
+  </style>
+  <g transform="scale(1.2) translate(-2 -2)">
+    <path fill-rule="evenodd" d="M7 2h10a5 5 0 0 1 5 5v5a5 5 0 0 1-5 5h-5.5L6.2 21 8.2 17H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5ZM8 7a1.25 1.25 0 0 1 1.25 1.25v2.5a1.25 1.25 0 0 1-2.5 0v-2.5A1.25 1.25 0 0 1 8 7ZM12 5a1.25 1.25 0 0 1 1.25 1.25v6.5a1.25 1.25 0 0 1-2.5 0v-6.5A1.25 1.25 0 0 1 12 5ZM16 6.25a1.25 1.25 0 0 1 1.25 1.25v4a1.25 1.25 0 0 1-2.5 0v-4a1.25 1.25 0 0 1 1.25-1.25Z"/>
+  </g>
+</svg>

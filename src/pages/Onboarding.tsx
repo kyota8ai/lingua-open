@@ -6,6 +6,7 @@ import { useSettings } from "../store/settings";
 import type { CEFRLevel, OnboardingProfile } from "../lib/types";
 import { Badge, Button, Field, TextInput } from "../components/ui";
 import { ProviderSetup } from "../components/ProviderSetup";
+import { Logo } from "../components/Logo";
 
 const LEVELS: Array<{ id: CEFRLevel; label: string; hint: string }> = [
   { id: "A1", label: "Just starting", hint: "I know a handful of words" },
@@ -45,16 +46,7 @@ export default function Onboarding() {
     <main className="min-h-dvh bg-canvas">
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
         <header className="mb-8">
-          <div className="flex items-center gap-2.5 mb-8">
-            <span className="grid place-items-center size-8 rounded-[10px] bg-accent" aria-hidden>
-              <span className="flex items-end gap-[3px]">
-                <span className="w-[3px] h-2 rounded-full bg-on-accent" />
-                <span className="w-[3px] h-3.5 rounded-full bg-on-accent" />
-                <span className="w-[3px] h-2.5 rounded-full bg-on-accent" />
-              </span>
-            </span>
-            <span className="text-[17px] font-semibold tracking-tight">lingua-open</span>
-          </div>
+          <Logo className="mb-8" />
           <nav aria-label="Setup progress" className="flex items-center gap-2">
             {steps.map((label, i) => (
               <div key={label} className="flex-1">

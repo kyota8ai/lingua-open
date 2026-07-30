@@ -2,13 +2,14 @@ import type { ConversationProvider, ProviderEvents } from "./types";
 import { ProviderError } from "./types";
 import type { PromptContext } from "../prompts";
 import { buildSystemPrompt } from "../prompts";
+import { FALLBACK_MODELS } from "../models";
+import { normalizeTranscript } from "../transcript";
 
 /**
  * Gemini Live API over WebSocket, key sent directly from the browser (BYOK).
  * Mic audio: 16 kHz PCM16 chunks. Model audio: 24 kHz PCM16, played through
  * a scheduled AudioContext queue.
  */
-export const GEMINI_LIVE_MODEL = "gemini-2.5-flash-native-audio-preview-09-2025";
 const WS_URL =
   "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent";
 
@@ -33,7 +34,7 @@ export class GeminiLiveProvider implements ConversationProvider {
 
   constructor(
     private apiKey: string,
-    private model: string = GEMINI_LIVE_MODEL,
+    private model: string = FALLBACK_MODELS.gemini.conversation,
   ) {}
 
   async connect(ctx: PromptContext, events: ProviderEvents): Promise<void> {
@@ -152,17 +153,17 @@ export class GeminiLiveProvider implements ConversationProvider {
 
     if (content.inputTranscription?.text) {
       this.userBuf += content.inputTranscription.text;
-      this.events?.onTranscript({ id: this.userTurnId, role: "user", text: this.userBuf.trim(), final: false });
+      this.events?.onTranscript({ id: this.userTurnId, role: "user", text: clean(this.userBuf), final: false });
     }
     if (content.outputTranscription?.text) {
       // Model reply started: finalize the user's turn first.
       if (this.userBuf.trim()) {
-        this.events?.onTranscript({ id: this.userTurnId, role: "user", text: this.userBuf.trim(), final: true });
+        this.events?.onTranscript({ id: this.userTurnId, role: "user", text: clean(this.userBuf), final: true });
         this.userBuf = "";
         this.userTurnId = crypto.randomUUID();
       }
       this.modelBuf += content.outputTranscription.text;
-      this.events?.onTranscript({ id: this.modelTurnId, role: "assistant", text: this.modelBuf.trim(), final: false });
+      this.events?.onTranscript({ id: this.modelTurnId, role: "assistant", text: clean(this.modelBuf), final: false });
     }
 
     const parts = content.modelTurn?.parts ?? [];
@@ -176,7 +177,7 @@ export class GeminiLiveProvider implements ConversationProvider {
     }
     if (content.turnComplete) {
       if (this.modelBuf.trim()) {
-        this.events?.onTranscript({ id: this.modelTurnId, role: "assistant", text: this.modelBuf.trim(), final: true });
+        this.events?.onTranscript({ id: this.modelTurnId, role: "assistant", text: clean(this.modelBuf), final: true });
       }
       this.modelBuf = "";
       this.modelTurnId = crypto.randomUUID();
@@ -325,6 +326,11 @@ export class GeminiLiveProvider implements ConversationProvider {
     }
     this.events?.onStatus("ended");
   }
+}
+
+/** Recognizer output needs script-aware whitespace cleanup before display. */
+function clean(text: string): string {
+  return normalizeTranscript(text.trim());
 }
 
 function base64FromBytes(bytes: Uint8Array): string {

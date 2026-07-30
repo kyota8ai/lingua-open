@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Eye, EyeSlash, Warning } from "@phosphor-icons/react";
+import { CheckCircle, Eye, EyeSlash, Warning } from "@phosphor-icons/react";
 import { useSettings } from "../store/settings";
 import type { ProviderId } from "../lib/types";
-import { Field } from "./ui";
+import { listModels, pickDefault, type ModelCatalog } from "../lib/models";
+import { Button, Field, Select } from "./ui";
 
 /**
  * BYOK setup. The cost comparison is shown as-is and the Gemini free-tier
@@ -38,8 +39,47 @@ const OPTIONS: Array<{
 export function ProviderSetup() {
   const settings = useSettings();
   const [showKey, setShowKey] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [catalog, setCatalog] = useState<ModelCatalog | null>(null);
+  const [checkError, setCheckError] = useState<{ message: string; hint?: string } | null>(null);
 
   const keyValue = settings.provider === "openai" ? settings.openaiKey : settings.geminiKey;
+  const vendor = settings.provider === "openai" ? "openai" : "gemini";
+
+  /*
+   * Asking the provider what this key can use serves two purposes: it verifies
+   * the key without starting a paid session, and it replaces hardcoded model
+   * IDs, which eventually stop resolving and return 404.
+   */
+  async function checkKey() {
+    setChecking(true);
+    setCheckError(null);
+    setCatalog(null);
+    try {
+      const found = await listModels(settings.provider, keyValue);
+      setCatalog(found);
+      // Only preselect where the learner has not chosen already.
+      const patch: Record<string, string> = {};
+      const chosenConversation = vendor === "openai" ? settings.openaiConversationModel : settings.geminiConversationModel;
+      const chosenText = vendor === "openai" ? settings.openaiTextModel : settings.geminiTextModel;
+      if (!chosenConversation && found.conversation.length > 0) {
+        patch[vendor === "openai" ? "openaiConversationModel" : "geminiConversationModel"] = pickDefault(
+          found.conversation,
+          vendor,
+          "conversation",
+        );
+      }
+      if (!chosenText && found.text.length > 0) {
+        patch[vendor === "openai" ? "openaiTextModel" : "geminiTextModel"] = pickDefault(found.text, vendor, "text");
+      }
+      if (Object.keys(patch).length > 0) settings.setPartial(patch);
+    } catch (e) {
+      const err = e as { message?: string; hint?: string };
+      setCheckError({ message: err.message ?? "Could not check the key.", hint: err.hint });
+    } finally {
+      setChecking(false);
+    }
+  }
 
   return (
     <div>
@@ -121,6 +161,76 @@ export function ProviderSetup() {
               </button>
             </div>
           </Field>
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <Button variant="secondary" size="sm" onClick={checkKey} disabled={!keyValue || checking}>
+              {checking ? "Checking..." : "Check key and load models"}
+            </Button>
+            {catalog && !checkError && (
+              <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-good">
+                <CheckCircle size={15} weight="fill" aria-hidden />
+                Key works
+              </span>
+            )}
+          </div>
+
+          {checkError && (
+            <p className="mt-2 text-[13px] text-live leading-snug" role="alert">
+              {checkError.message}
+              {checkError.hint && <span className="text-ink-muted"> {checkError.hint}</span>}
+            </p>
+          )}
+
+          {catalog && (
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label="Conversation model"
+                htmlFor="model-conversation"
+                helper="Used for the live voice session."
+              >
+                <Select
+                  id="model-conversation"
+                  value={vendor === "openai" ? settings.openaiConversationModel : settings.geminiConversationModel}
+                  onChange={(e) =>
+                    settings.setPartial(
+                      vendor === "openai"
+                        ? { openaiConversationModel: e.target.value }
+                        : { geminiConversationModel: e.target.value },
+                    )
+                  }
+                >
+                  {catalog.conversation.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Text model" htmlFor="model-text" helper="Used for feedback and tap-to-translate.">
+                <Select
+                  id="model-text"
+                  value={vendor === "openai" ? settings.openaiTextModel : settings.geminiTextModel}
+                  onChange={(e) =>
+                    settings.setPartial(
+                      vendor === "openai" ? { openaiTextModel: e.target.value } : { geminiTextModel: e.target.value },
+                    )
+                  }
+                >
+                  {catalog.text.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              {catalog.conversation.length === 0 && (
+                <p className="sm:col-span-2 text-[13px] text-warn leading-snug">
+                  This key has no realtime voice model available. Voice conversations will not connect until the
+                  provider grants access to one.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

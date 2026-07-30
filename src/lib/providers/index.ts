@@ -4,12 +4,13 @@ import { OpenAIRealtimeProvider } from "./openai";
 import { GeminiLiveProvider } from "./gemini";
 import { DemoProvider } from "./demo";
 
-export function createProvider(id: ProviderId, apiKey: string): ConversationProvider {
+/** `model` comes from settings, which resolves discovery choice or fallback. */
+export function createProvider(id: ProviderId, apiKey: string, model?: string): ConversationProvider {
   switch (id) {
     case "openai":
-      return new OpenAIRealtimeProvider(apiKey);
+      return new OpenAIRealtimeProvider(apiKey, model);
     case "gemini":
-      return new GeminiLiveProvider(apiKey);
+      return new GeminiLiveProvider(apiKey, model);
     case "demo":
       return new DemoProvider();
   }

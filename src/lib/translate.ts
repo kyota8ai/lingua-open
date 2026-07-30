@@ -1,5 +1,4 @@
 import type { ProviderId } from "./types";
-import { GEMINI_TEXT_MODEL, OPENAI_TEXT_MODEL } from "./feedback";
 
 export interface WordGloss {
   meaning: string;
@@ -18,6 +17,7 @@ export async function glossWord(
   term: string,
   sentence: string,
   langLabel: string,
+  model: string,
 ): Promise<WordGloss> {
   const key = `${langLabel}:${term}:${sentence.slice(0, 60)}`;
   const hit = cache.get(key);
@@ -37,7 +37,7 @@ export async function glossWord(
     `Sentence: ${sentence}`,
   ].join("\n");
 
-  const raw = provider === "openai" ? await callOpenAI(apiKey, prompt) : await callGemini(apiKey, prompt);
+  const raw = provider === "openai" ? await callOpenAI(apiKey, prompt, model) : await callGemini(apiKey, prompt, model);
   const parsed = parseGloss(raw);
   cache.set(key, parsed);
   return parsed;
@@ -60,12 +60,12 @@ function parseGloss(raw: string): WordGloss {
   throw new Error("Could not read the translation.");
 }
 
-async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
+async function callOpenAI(apiKey: string, prompt: string, model: string): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: OPENAI_TEXT_MODEL,
+      model,
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
       max_tokens: 80,
@@ -76,9 +76,9 @@ async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
   return data.choices?.[0]?.message?.content ?? "";
 }
 
-async function callGemini(apiKey: string, prompt: string): Promise<string> {
+async function callGemini(apiKey: string, prompt: string, model: string): Promise<string> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: "POST",
       headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },

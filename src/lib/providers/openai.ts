@@ -2,6 +2,8 @@ import type { ConversationProvider, ProviderEvents } from "./types";
 import { ProviderError } from "./types";
 import type { PromptContext } from "../prompts";
 import { buildSystemPrompt } from "../prompts";
+import { FALLBACK_MODELS } from "../models";
+import { normalizeTranscript } from "../transcript";
 
 /**
  * OpenAI Realtime over WebRTC, key sent directly from the browser (BYOK).
@@ -9,7 +11,6 @@ import { buildSystemPrompt } from "../prompts";
  * backend; with BYOK the user talks to OpenAI with their own key on purpose
  * key on purpose. No middleman exists to mint ephemeral tokens.
  */
-export const OPENAI_REALTIME_MODEL = "gpt-realtime-mini";
 const BASE_URL = "https://api.openai.com/v1/realtime/calls";
 
 export class OpenAIRealtimeProvider implements ConversationProvider {
@@ -25,7 +26,7 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
 
   constructor(
     private apiKey: string,
-    private model: string = OPENAI_REALTIME_MODEL,
+    private model: string = FALLBACK_MODELS.openai.conversation,
   ) {}
 
   async connect(ctx: PromptContext, events: ProviderEvents): Promise<void> {
@@ -119,7 +120,7 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
     const type = ev.type as string;
 
     if (type === "conversation.item.input_audio_transcription.completed") {
-      const text = (ev.transcript as string | undefined)?.trim();
+      const text = clean((ev.transcript as string | undefined) ?? "");
       if (text) {
         this.events?.onTranscript({ id: (ev.item_id as string) ?? crypto.randomUUID(), role: "user", text, final: true });
       }
@@ -127,12 +128,13 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
       const id = (ev.item_id as string) ?? "assistant";
       const acc = (this.pendingAssistant.get(id) ?? "") + ((ev.delta as string) ?? "");
       this.pendingAssistant.set(id, acc);
-      this.events?.onTranscript({ id, role: "assistant", text: acc, final: false });
+      this.events?.onTranscript({ id, role: "assistant", text: clean(acc), final: false });
     } else if (type === "response.output_audio_transcript.done" || type === "response.audio_transcript.done") {
       const id = (ev.item_id as string) ?? "assistant";
       const text = (ev.transcript as string | undefined) ?? this.pendingAssistant.get(id) ?? "";
       this.pendingAssistant.delete(id);
-      if (text.trim()) this.events?.onTranscript({ id, role: "assistant", text: text.trim(), final: true });
+      const done = clean(text);
+      if (done) this.events?.onTranscript({ id, role: "assistant", text: done, final: true });
     } else if (type === "error") {
       const err = ev.error as { message?: string } | undefined;
       this.events?.onError(err?.message ?? "Realtime API error");
@@ -220,4 +222,9 @@ export class OpenAIRealtimeProvider implements ConversationProvider {
     }
     this.events?.onStatus("ended");
   }
+}
+
+/** Recognizer output needs script-aware whitespace cleanup before display. */
+function clean(text: string): string {
+  return normalizeTranscript(text.trim());
 }

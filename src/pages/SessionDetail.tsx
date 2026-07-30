@@ -232,6 +232,7 @@ export default function SessionDetail() {
                 langLabel={dialect.label}
                 provider={glossProvider}
                 apiKey={glossKey}
+                textModel={settings.activeTextModel()}
                 className="target-lang text-[15px] text-ink"
               />
             </div>

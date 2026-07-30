@@ -61,7 +61,11 @@ export default function Conversation() {
 
     session.start();
     setPhase("live");
-    const provider = createProvider(isDemo ? "demo" : settings.provider, settings.activeKey());
+    const provider = createProvider(
+      isDemo ? "demo" : settings.provider,
+      settings.activeKey(),
+      settings.activeConversationModel(),
+    );
     providerRef.current = provider;
     try {
       await provider.connect(promptCtx, {
@@ -137,7 +141,13 @@ export default function Conversation() {
 
     // Feedback generation happens on the feedback page (it shows progress there),
     // but we kick it off here so the result is ready sooner.
-    void generateFeedback(isDemo ? "demo" : settings.provider, settings.activeKey(), finalTurns, promptCtx)
+    void generateFeedback(
+      isDemo ? "demo" : settings.provider,
+      settings.activeKey(),
+      finalTurns,
+      promptCtx,
+      settings.activeTextModel(),
+    )
       .then((fb) => db.sessions.update(id, { feedback: fb }))
       .catch(() => {
         /* feedback failure never blocks the session record */
@@ -327,6 +337,7 @@ export default function Conversation() {
                     langLabel={dialect.label}
                     provider={isDemo ? "demo" : settings.provider}
                     apiKey={settings.activeKey()}
+                    textModel={settings.activeTextModel()}
                     className="target-lang text-[16px]"
                   />
                 )}

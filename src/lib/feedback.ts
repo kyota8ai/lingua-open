@@ -2,35 +2,35 @@ import type { ProviderId, SessionFeedback, TranscriptTurn } from "./types";
 import type { PromptContext } from "./prompts";
 import { buildFeedbackPrompt } from "./prompts";
 
-export const OPENAI_TEXT_MODEL = "gpt-4.1-mini";
-export const GEMINI_TEXT_MODEL = "gemini-2.5-flash";
-
 /**
  * Post-session feedback: send the transcript to a text model with the same
- * key. Failures must degrade gracefully and never block saving the session.
+ * key. The model ID comes from settings (discovery choice or fallback) rather
+ * than a constant here, because hardcoded IDs eventually 404. Failures must
+ * degrade gracefully and never block saving the session.
  */
 export async function generateFeedback(
   provider: ProviderId,
   apiKey: string,
   transcript: TranscriptTurn[],
   ctx: PromptContext,
+  model: string,
 ): Promise<SessionFeedback> {
   const text = transcript.map((t) => `${t.role === "user" ? "LEARNER" : "PARTNER"}: ${t.text}`).join("\n");
   const prompt = buildFeedbackPrompt(text, ctx);
 
   if (provider === "demo") return demoFeedback();
 
-  const raw = provider === "openai" ? await callOpenAI(apiKey, prompt) : await callGemini(apiKey, prompt);
+  const raw = provider === "openai" ? await callOpenAI(apiKey, prompt, model) : await callGemini(apiKey, prompt, model);
   const parsed = parseFeedbackJson(raw);
   return { ...parsed, generatedAt: Date.now() };
 }
 
-async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
+async function callOpenAI(apiKey: string, prompt: string, model: string): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: OPENAI_TEXT_MODEL,
+      model,
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
     }),
@@ -40,9 +40,9 @@ async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
   return data.choices?.[0]?.message?.content ?? "";
 }
 
-async function callGemini(apiKey: string, prompt: string): Promise<string> {
+async function callGemini(apiKey: string, prompt: string, model: string): Promise<string> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: "POST",
       headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },

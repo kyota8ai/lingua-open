@@ -11,6 +11,7 @@ interface Props {
   langLabel: string;
   provider: ProviderId;
   apiKey: string;
+  textModel: string;
   className?: string;
 }
 
@@ -23,7 +24,7 @@ type PanelState =
  * Transcript text where every word is tappable: tap -> contextual gloss on
  * the learner's own key, one more tap -> saved to the SRS deck.
  */
-export function TappableText({ text, langCode, langLabel, provider, apiKey, className }: Props) {
+export function TappableText({ text, langCode, langLabel, provider, apiKey, textModel, className }: Props) {
   const segments = useMemo(() => segmentWords(text, langCode), [text, langCode]);
   const [panel, setPanel] = useState<PanelState | null>(null);
 
@@ -34,7 +35,7 @@ export function TappableText({ text, langCode, langLabel, provider, apiKey, clas
     }
     setPanel({ term, status: "loading" });
     try {
-      const gloss = await glossWord(provider, apiKey, term, text, langLabel);
+      const gloss = await glossWord(provider, apiKey, term, text, langLabel, textModel);
       setPanel((p) => (p?.term === term ? { term, status: "done", gloss, saved: false } : p));
     } catch (e) {
       setPanel((p) =>

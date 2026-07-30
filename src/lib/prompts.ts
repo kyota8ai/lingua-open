@@ -24,16 +24,66 @@ export interface PromptContext {
 export function buildSystemPrompt(ctx: PromptContext): string {
   const lang = findLanguage(ctx.languageCode);
   const dialect = findDialect(ctx.languageCode, ctx.dialectId);
+  const scenario = ctx.scenario;
 
-  const parts: string[] = [
-    `You are a friendly ${dialect.label} conversation partner helping an adult learner practice speaking ${lang.label}.`,
+  /*
+   * Sectioned rather than a flat list of sentences, and the role is stated
+   * first and restated last: models attend most strongly to the start and end
+   * of an instruction block. The role-boundary rules exist because a flat
+   * prompt let the model perform the learner's side of the conversation (a
+   * barista asking the customer for recommendations).
+   */
+  const parts: string[] = [];
+
+  if (scenario) {
+    parts.push(
+      "# Who you are",
+      `You are playing a character in a spoken roleplay that helps an adult learner practice ${lang.label}.`,
+      scenario.situation,
+      "",
+      "# Role boundaries (most important rules)",
+      "- You are NOT the learner. Never speak the learner's side of the conversation for them.",
+      "- Never ask the learner to do your character's job. If your character is the one who serves, advises or interviews, you do that; the learner responds.",
+      "- Stay in character for the entire session, even if the learner goes off topic.",
+      "- If the learner hesitates or goes quiet, stay in character and gently prompt them.",
+    );
+
+    if (scenario.tasks.length > 0) {
+      parts.push(
+        "",
+        "# What the LEARNER is practicing (their job, not yours)",
+        "Create natural openings so they can do these. Do not do them yourself:",
+        ...scenario.tasks.map((t) => `- ${t}`),
+      );
+    }
+
+    if (scenario.goalPhrases.length > 0) {
+      parts.push(
+        "",
+        "# Expressions the LEARNER is trying to use",
+        "These are the learner's lines, not yours. Steer the conversation so each one becomes usable, but do not say them yourself:",
+        ...scenario.goalPhrases.map((p) => `- ${p}`),
+      );
+    }
+  } else {
+    parts.push(
+      "# Who you are",
+      `You are a warm, curious conversation partner helping an adult learner practice speaking ${lang.label}.`,
+      "Let the learner steer the topic. Start by greeting them and asking an easy, open question about their day.",
+    );
+  }
+
+  parts.push(
+    "",
+    "# How to speak",
     dialect.promptNote,
     `Learner level: ${ctx.level}. ${LEVEL_NOTES[ctx.level]}`,
     "Always stay in the target language. If the learner is stuck, briefly help, then return to the target language.",
-    "Keep your turns short (one to three sentences) so the learner speaks at least half of the time. Ask questions.",
+    "Keep your turns short (one to three sentences) so the learner speaks at least half of the time.",
+    "Ask questions that fit your character and move the situation forward.",
     "Do not correct every mistake mid-flow. Only recast serious errors naturally in your reply.",
     'If the learner says "slower please" or similar, slow down and simplify.',
-  ];
+  );
 
   if (ctx.profile?.goal) {
     const goalNote: Record<string, string> = {
@@ -49,21 +99,22 @@ export function buildSystemPrompt(ctx: PromptContext): string {
     parts.push(`The learner works as: ${ctx.profile.occupation}. Use this for personalized examples when relevant.`);
   }
 
-  if (ctx.scenario) {
+  if (scenario) {
     parts.push(
-      `ROLEPLAY: ${ctx.scenario.situation}`,
-      "Stay in this role for the whole session. Start the conversation yourself with a short, natural opening line for the situation.",
+      "",
+      "# Before you speak, remember",
+      `Your character: ${firstSentence(scenario.situation)}`,
+      "You are not the learner, and you never take their turn. Open the conversation now with one short, natural line that fits the situation.",
     );
-    if (ctx.scenario.tasks.length > 0) {
-      parts.push(
-        `The learner is trying to complete these tasks: ${ctx.scenario.tasks.join("; ")}. Give them natural openings to do so.`,
-      );
-    }
-  } else {
-    parts.push("Start by greeting the learner and asking an easy, open question about their day.");
   }
 
   return parts.join("\n");
+}
+
+/** The opening sentence of a situation carries the role, so it works as a reminder. */
+function firstSentence(text: string): string {
+  const match = text.match(/^[^.!?]*[.!?]/);
+  return (match ? match[0] : text).trim();
 }
 
 /** Prompt for the post-session feedback call (text LLM, same key). */

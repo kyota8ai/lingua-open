@@ -10,6 +10,11 @@ export interface DialectPreset {
   nativeLabel?: string;
   /** Extra system-prompt instructions that keep the model in this variety */
   promptNote: string;
+  /**
+   * BCP-47 tag for the speech recognizer. Without it, a short utterance can be
+   * transcribed into the wrong script entirely.
+   */
+  bcp47: string;
   beta?: boolean;
 }
 

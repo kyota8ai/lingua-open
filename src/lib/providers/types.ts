@@ -31,6 +31,12 @@ export interface ConversationProvider {
 }
 
 export class ProviderError extends Error {
+  /**
+   * Set when a setup was refused and the only unverifiable part of it was the
+   * language hint, so the caller may retry once without it.
+   */
+  retryWithoutLanguage?: boolean;
+
   constructor(
     message: string,
     /** user-facing recovery hint */

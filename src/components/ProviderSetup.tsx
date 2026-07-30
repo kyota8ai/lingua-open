@@ -47,6 +47,7 @@ export function ProviderSetup() {
   const vendor = settings.provider === "openai" ? "openai" : "gemini";
   // Cached in settings, so the pickers are there after a reload.
   const catalog = vendor === "openai" ? settings.openaiCatalog : settings.geminiCatalog;
+  const nativeAudioSelected = /native-audio/i.test(settings.activeConversationModel());
 
   /*
    * Asking the provider what this key can use serves two purposes: it verifies
@@ -201,7 +202,11 @@ export function ProviderSetup() {
               <Field
                 label="Conversation model"
                 htmlFor="model-conversation"
-                helper="Used for the live voice session."
+                helper={
+                  nativeAudioSelected
+                    ? "Native audio sounds the most natural, but it detects the language itself, so a short answer can be transcribed in the wrong script."
+                    : "Used for the live voice session. This one takes a language hint, so transcripts stay in your target language."
+                }
               >
                 <Select
                   id="model-conversation"

@@ -5,6 +5,7 @@ import { buildSystemPrompt } from "../prompts";
 import { FALLBACK_MODELS } from "../models";
 import { DEFAULT_VOICES } from "../data/voices";
 import { normalizeTranscript } from "../transcript";
+import { findDialect } from "../data/languages";
 
 /**
  * Gemini Live API over WebSocket, key sent directly from the browser (BYOK).
@@ -58,95 +59,134 @@ export class GeminiLiveProvider implements ConversationProvider {
     // moment to get a running AudioContext rather than a suspended one.
     this.ensureOutCtx();
 
+    /*
+     * Pin the recognizer to the learner's language. Without it a short
+     * utterance gets auto-detected and can come back in the wrong script
+     * entirely (Japanese speech transcribed as Hangul). Native audio models
+     * pick the language themselves and reject the hint, and the accepted tag
+     * list is not something we can verify, so a rejected setup retries once
+     * without it rather than leaving the learner with a dead session.
+     */
+    const wantsLanguage = supportsLanguageCode(this.model);
     try {
-      await new Promise<void>((resolve, reject) => {
-        let settled = false;
-        const settle = (fn: () => void) => {
-          if (settled) return;
-          settled = true;
-          window.clearTimeout(timeout);
-          fn();
-        };
-        // A close with an unexpected code (quota, bad model, server error) fires
-        // no error event; without this the connect promise would hang forever.
-        const timeout = window.setTimeout(() => {
-          settle(() =>
-            reject(new ProviderError("Connecting to Gemini timed out.", "Check your network and API key, then try again.")),
-          );
-        }, 15000);
-
-        const ws = new WebSocket(`${WS_URL}?key=${encodeURIComponent(this.apiKey)}`);
-        this.ws = ws;
-
-        ws.onopen = () => {
-          ws.send(
-            JSON.stringify({
-              setup: {
-                model: `models/${this.model}`,
-                generationConfig: {
-                  responseModalities: ["AUDIO"],
-                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: this.voice } } },
-                },
-                systemInstruction: { parts: [{ text: buildSystemPrompt(ctx) }] },
-                inputAudioTranscription: {},
-                outputAudioTranscription: {},
-              },
-            }),
-          );
-        };
-
-        ws.onmessage = async (e) => {
-          const data = typeof e.data === "string" ? e.data : await (e.data as Blob).text();
-          let msg: Record<string, unknown>;
-          try {
-            msg = JSON.parse(data) as Record<string, unknown>;
-          } catch {
-            return;
-          }
-          if (msg.setupComplete !== undefined) {
-            await this.startMicPipeline();
-            // Kick off the model's opening line per the system prompt.
-            this.sendClientText("(The session has started. Open the conversation as instructed.)", false);
-            this.events?.onStatus("live");
-            settle(resolve);
-            return;
-          }
-          this.handleServerMessage(msg);
-        };
-
-        ws.onerror = () => {
-          settle(() =>
-            reject(
-              new ProviderError("Could not reach the Gemini Live API.", "Check the API key in Settings and your network."),
-            ),
-          );
-        };
-        ws.onclose = (ev) => {
-          if (!settled) {
-            // Closed before setup completed: surface it, whatever the code.
-            const keyProblem = ev.code === 1008 || ev.code === 4001;
-            settle(() =>
-              reject(
-                keyProblem
-                  ? new ProviderError("Gemini rejected the API key.", "Check the key in Settings. It stays in this browser only.")
-                  : new ProviderError(`Gemini closed the connection (${ev.code}).`, ev.reason || "Try again in a moment."),
-              ),
-            );
-            return;
-          }
-          if (!this.closing) {
-            this.events?.onError("The connection to Gemini dropped mid-session.");
-            this.events?.onStatus("error", "Connection lost");
-          } else {
-            this.events?.onStatus("ended");
-          }
-        };
-      });
+      await this.openSession(ctx, wantsLanguage);
     } catch (e) {
-      // Release the mic and socket from the failed attempt.
-      await this.disconnect().catch(() => {});
-      throw e;
+      const retryable = wantsLanguage && e instanceof ProviderError && e.retryWithoutLanguage === true;
+      if (!retryable) {
+        await this.disconnect().catch(() => {});
+        throw e;
+      }
+      this.ws?.close();
+      this.ws = null;
+      try {
+        await this.openSession(ctx, false);
+      } catch (again) {
+        await this.disconnect().catch(() => {});
+        throw again;
+      }
     }
+  }
+
+  private openSession(ctx: PromptContext, withLanguage: boolean): Promise<void> {
+    const languageCode = withLanguage ? findDialect(ctx.languageCode, ctx.dialectId).bcp47 : undefined;
+    return new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const settle = (fn: () => void) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
+        fn();
+      };
+      // A close with an unexpected code (quota, bad model, server error) fires
+      // no error event; without this the connect promise would hang forever.
+      const timeout = window.setTimeout(() => {
+        settle(() =>
+          reject(new ProviderError("Connecting to Gemini timed out.", "Check your network and API key, then try again.")),
+        );
+      }, 15000);
+
+      const ws = new WebSocket(`${WS_URL}?key=${encodeURIComponent(this.apiKey)}`);
+      this.ws = ws;
+
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            setup: {
+              model: `models/${this.model}`,
+              generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                  voiceConfig: { prebuiltVoiceConfig: { voiceName: this.voice } },
+                  ...(languageCode ? { languageCode } : {}),
+                },
+              },
+              systemInstruction: { parts: [{ text: buildSystemPrompt(ctx) }] },
+              inputAudioTranscription: {},
+              outputAudioTranscription: {},
+            },
+          }),
+        );
+      };
+
+      ws.onmessage = async (e) => {
+        const data = typeof e.data === "string" ? e.data : await (e.data as Blob).text();
+        let msg: Record<string, unknown>;
+        try {
+          msg = JSON.parse(data) as Record<string, unknown>;
+        } catch {
+          return;
+        }
+        if (msg.setupComplete !== undefined) {
+          await this.startMicPipeline();
+          // Kick off the model's opening line per the system prompt.
+          this.sendClientText("(The session has started. Open the conversation as instructed.)", false);
+          this.events?.onStatus("live");
+          settle(resolve);
+          return;
+        }
+        this.handleServerMessage(msg);
+      };
+
+      ws.onerror = () => {
+        settle(() =>
+          reject(
+            new ProviderError("Could not reach the Gemini Live API.", "Check the API key in Settings and your network."),
+          ),
+        );
+      };
+      ws.onclose = (ev) => {
+        if (!settled) {
+          // Closed before setup completed: surface it, whatever the code.
+          const keyProblem = ev.code === 1008 || ev.code === 4001;
+          settle(() => {
+            if (keyProblem) {
+              reject(
+                new ProviderError(
+                  "Gemini rejected the API key.",
+                  "Check the key in Settings. It stays in this browser only.",
+                ),
+              );
+              return;
+            }
+            const err = new ProviderError(
+              `Gemini closed the connection (${ev.code}).`,
+              ev.reason || "Try again in a moment.",
+            );
+            // The setup we just sent may have been refused over the language
+            // hint; the caller decides whether to retry without it.
+            err.retryWithoutLanguage = languageCode !== undefined;
+            reject(err);
+          });
+          return;
+        }
+        if (!this.closing) {
+          this.events?.onError("The connection to Gemini dropped mid-session.");
+          this.events?.onStatus("error", "Connection lost");
+        } else {
+          this.events?.onStatus("ended");
+        }
+      };
+    });
   }
 
   private handleServerMessage(msg: Record<string, unknown>) {
@@ -355,6 +395,14 @@ export class GeminiLiveProvider implements ConversationProvider {
     }
     this.events?.onStatus("ended");
   }
+}
+
+/**
+ * Native audio models choose the spoken language themselves and do not accept
+ * a language hint; every other live model does.
+ */
+function supportsLanguageCode(model: string): boolean {
+  return !/native-audio/i.test(model);
 }
 
 /** Recognizer output needs script-aware whitespace cleanup before display. */

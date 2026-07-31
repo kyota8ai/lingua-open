@@ -24,6 +24,17 @@ before it can be called ready.
   their own language
 - More scenarios, especially profession-specific ones
 - Install polish for the PWA on real iOS and Android devices
+- **A local, open-weight provider**, so practice costs nothing and needs no API
+  key at all. Only two providers exist today because realtime two-way audio was
+  proprietary-only: a local text model can answer, but it cannot hold an open
+  audio session. That changed — servers such as Hugging Face's
+  `speech-to-speech` expose an OpenAI Realtime-compatible WebSocket over local
+  Whisper, MLX-LM and Kokoro, so this is a matter of pointing the existing
+  protocol somewhere else rather than writing a third one. The trade-off is
+  language coverage: the TTS side is the constraint, and the open stacks reach
+  roughly eight languages against Gemini's 97. Running the models in the browser
+  on WebGPU would be the purest version of this, but the download size and the
+  quality of a small local model as a tutor do not justify it yet
 
 ## Later: the paid plan
 

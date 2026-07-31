@@ -8,7 +8,11 @@ It runs entirely in your browser with your own API key. There is no backend, no 
 
 Licensed under [AGPL-3.0](LICENSE).
 
-> **Status: pre-release.** The app is feature-complete and builds cleanly, but the realtime voice providers have not yet been validated against live API endpoints, and dialect quality has not been measured. A keyless demo mode lets you try the whole flow today. See [ROADMAP.md](ROADMAP.md).
+![Scenario picker with dialect presets and CEFR levels](docs/screenshot-home.png)
+
+![A roleplay session with mission checklist, live transcript and voice controls](docs/screenshot-talk.png)
+
+> **Status: pre-release.** Feature-complete, and the Gemini Live path is validated with live conversations. The OpenAI Realtime path follows the documented API but has not yet been exercised with a live key, and dialect quality has not been measured. A keyless demo mode lets you try the whole flow today. See [ROADMAP.md](ROADMAP.md).
 
 ## Why this exists
 
@@ -43,6 +47,18 @@ lingua-open is built so that cannot happen. Not as a promise, but as a structure
 - **Verifiable.** You do not have to take our word for it. The whole app is open source, so anyone can check every claim above
 
 One honest caveat: your audio does reach the AI provider you pick, under their terms. OpenAI's API does not train on it by default, and neither does Google's paid tier. Google's **free** tier may, so the setup screen warns you and recommends a paid key.
+
+### Verify it yourself
+
+Do not trust the paragraph above; reproduce it. Five minutes, no tooling beyond your browser:
+
+1. Open the app, then DevTools → **Network**. Check "Preserve log"
+2. Run a full session: onboard, hold a conversation with your key, get feedback, tap a word to translate it
+3. Read the request list. Every request goes to the app's own origin, `generativelanguage.googleapis.com`, or `api.openai.com`. There is nothing else for your key or audio to reach — the Content-Security-Policy ([`public/_headers`](public/_headers)) forbids the browser from connecting anywhere but those origins, so this holds even if a dependency of this app were compromised
+4. Confirm the policy is actually served: `curl -sI <app url> | grep -i content-security` and read the `connect-src` list
+5. For the storage claim: DevTools → **Application** → IndexedDB and Local Storage. That is the entirety of where your data lives; clearing site data removes all of it
+
+The pieces worth reading if you want to go deeper: the CSP in [`vite.config.ts`](vite.config.ts), the two provider implementations in [`src/lib/providers/`](src/lib/providers), and the absence of any analytics, telemetry or first-party network code anywhere in [`src/`](src).
 
 ## Quick start
 

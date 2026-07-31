@@ -17,6 +17,38 @@ describe("buildSystemPrompt", () => {
     expect(p).toContain("Never drift into Modern Standard Arabic");
   });
 
+  /*
+   * Regression: a Kansai session came back in textbook standard Japanese. The
+   * note was one bullet in the middle of "How to speak" and was never restated,
+   * which is the weakest position in the prompt. It now gets the same
+   * first-and-last treatment that fixed the role inversion.
+   */
+  describe("dialect placement", () => {
+    const kansai = { ...ctx, languageCode: "ja", dialectId: "ja-kansai" };
+
+    it("gives the variety its own section, not a bullet under How to speak", () => {
+      const p = buildSystemPrompt(kansai);
+      expect(p).toContain("# Which variety you speak (this governs every word you say)");
+      expect(p.indexOf("# Which variety you speak")).toBeLessThan(p.indexOf("# How to speak"));
+    });
+
+    it("restates the variety in the closing line", () => {
+      const p = buildSystemPrompt(kansai);
+      expect(p.trimEnd().endsWith("spoken in Kansai Japanese.")).toBe(true);
+    });
+
+    it("names the variety at least twice, as the role fix does", () => {
+      const p = buildSystemPrompt(kansai);
+      expect(p.match(/Kansai Japanese/g)!.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("gives free talk the same closing reminder", () => {
+      const p = buildSystemPrompt({ ...kansai, scenario: null });
+      expect(p).toContain("# Which variety you speak");
+      expect(p.trimEnd().endsWith("spoken in Kansai Japanese.")).toBe(true);
+    });
+  });
+
   it("includes level guidance and scenario role", () => {
     const p = buildSystemPrompt(ctx);
     expect(p).toContain("Learner level: A2");
@@ -49,7 +81,7 @@ describe("buildSystemPrompt", () => {
     it("states the role first and restates it last", () => {
       expect(p.indexOf("# Who you are")).toBe(0);
       expect(p).toContain("# Before you speak, remember");
-      expect(p.trimEnd().endsWith("that fits the situation.")).toBe(true);
+      expect(p).toContain("You are not the learner, and you never take their turn.");
       // The role reminder repeats the character, so "barista" appears twice.
       expect(p.match(/barista/g)!.length).toBeGreaterThanOrEqual(2);
     });

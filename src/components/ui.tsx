@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import { CheckCircle, Warning, X } from "@phosphor-icons/react";
 
 function cx(...parts: Array<string | false | undefined>) {
   return parts.filter(Boolean).join(" ");
@@ -242,6 +243,66 @@ export function EmptyState({
 
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cx("animate-pulse bg-sunken rounded-(--radius-card)", className)} aria-hidden />;
+}
+
+export type SnackbarTone = "success" | "error";
+
+/**
+ * M3 snackbar: confirmation of an action that just happened.
+ *
+ * It is fixed to the bottom rather than rendered inline, because the action
+ * that needs confirming can be anywhere on a long page. A notice at the top of
+ * Settings was invisible from the Data section at the bottom, so a successful
+ * import looked like nothing had happened at all.
+ *
+ * Tone is carried by the icon and the wording, never by colour alone. Success
+ * dismisses itself; an error stays until it is acknowledged, because a failure
+ * the user missed is worse than one they have to close.
+ */
+export function Snackbar({
+  message,
+  tone = "success",
+  onDismiss,
+}: {
+  message: string;
+  tone?: SnackbarTone;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    if (tone === "error") return;
+    const t = setTimeout(onDismiss, 6000);
+    return () => clearTimeout(t);
+  }, [tone, message, onDismiss]);
+
+  const Icon = tone === "error" ? Warning : CheckCircle;
+  return (
+    <div
+      // Clears the mobile bottom nav, and the safe area under it.
+      className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-6 pointer-events-none"
+    >
+      <div
+        role={tone === "error" ? "alert" : "status"}
+        aria-live={tone === "error" ? "assertive" : "polite"}
+        className="pointer-events-auto flex items-start gap-3 w-full max-w-md rounded-(--radius-field) bg-[var(--md-sys-color-inverse-surface)] text-[var(--md-sys-color-inverse-on-surface)] px-4 py-3 shadow-lg motion-safe:animate-[snack-in_200ms_var(--ease-emphasized-decelerate)]"
+      >
+        <Icon
+          size={18}
+          weight="fill"
+          className={cx("shrink-0 mt-0.5", tone === "error" ? "text-warn" : "text-good")}
+          aria-hidden
+        />
+        <p className="flex-1 text-[14px] leading-relaxed">{message}</p>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="state-layer shrink-0 -mr-1.5 -mt-1 grid place-items-center size-8 rounded-(--radius-control) cursor-pointer"
+        >
+          <X size={15} aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {

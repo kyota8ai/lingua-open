@@ -27,11 +27,17 @@ export function buildSystemPrompt(ctx: PromptContext): string {
   const scenario = ctx.scenario;
 
   /*
-   * Sectioned rather than a flat list of sentences, and the role is stated
-   * first and restated last: models attend most strongly to the start and end
-   * of an instruction block. The role-boundary rules exist because a flat
-   * prompt let the model perform the learner's side of the conversation (a
-   * barista asking the customer for recommendations).
+   * Sectioned rather than a flat list of sentences, and the two things that
+   * break most visibly — who is speaking, and which variety they speak — are
+   * both stated near the start and restated at the very end, because models
+   * attend most strongly to the start and end of an instruction block.
+   *
+   * The role-boundary rules exist because a flat prompt let the model perform
+   * the learner's side of the conversation (a barista asking the customer for
+   * recommendations). The dialect section exists for the same reason one step
+   * later: the dialect note used to be one bullet in the middle of "How to
+   * speak" and was never restated, so a Kansai session came back in textbook
+   * standard Japanese.
    */
   const parts: string[] = [];
 
@@ -40,6 +46,8 @@ export function buildSystemPrompt(ctx: PromptContext): string {
       "# Who you are",
       `You are playing a character in a spoken roleplay that helps an adult learner practice ${lang.label}.`,
       scenario.situation,
+      "",
+      ...dialectSection(dialect),
       "",
       "# Role boundaries (most important rules)",
       "- You are NOT the learner. Never speak the learner's side of the conversation for them.",
@@ -70,13 +78,14 @@ export function buildSystemPrompt(ctx: PromptContext): string {
       "# Who you are",
       `You are a warm, curious conversation partner helping an adult learner practice speaking ${lang.label}.`,
       "Let the learner steer the topic. Start by greeting them and asking an easy, open question about their day.",
+      "",
+      ...dialectSection(dialect),
     );
   }
 
   parts.push(
     "",
     "# How to speak",
-    dialect.promptNote,
     `Learner level: ${ctx.level}. ${LEVEL_NOTES[ctx.level]}`,
     "Always stay in the target language. If the learner is stuck, briefly help, then return to the target language.",
     "Keep your turns short (one to three sentences) so the learner speaks at least half of the time.",
@@ -99,16 +108,35 @@ export function buildSystemPrompt(ctx: PromptContext): string {
     parts.push(`The learner works as: ${ctx.profile.occupation}. Use this for personalized examples when relevant.`);
   }
 
+  /*
+   * The closing block is the last thing the model reads, so it carries both
+   * failure modes at once and ends on the variety.
+   */
+  parts.push("", "# Before you speak, remember");
   if (scenario) {
     parts.push(
-      "",
-      "# Before you speak, remember",
       `Your character: ${firstSentence(scenario.situation)}`,
-      "You are not the learner, and you never take their turn. Open the conversation now with one short, natural line that fits the situation.",
+      "You are not the learner, and you never take their turn.",
     );
   }
+  parts.push(
+    `Open the conversation now with one short, natural line that fits the situation, spoken in ${dialect.label}.`,
+  );
 
   return parts.join("\n");
+}
+
+/**
+ * The variety gets its own section instead of a bullet inside "How to speak".
+ * Placed directly under the role at the top, and restated at the very end:
+ * mentioned once in the middle, it was reliably ignored.
+ */
+function dialectSection(dialect: { label: string; promptNote: string }): string[] {
+  return [
+    "# Which variety you speak (this governs every word you say)",
+    dialect.promptNote,
+    `Every single line you speak must be recognisably ${dialect.label}, from your very first sentence onward.`,
+  ];
 }
 
 /** The opening sentence of a situation carries the role, so it works as a reminder. */

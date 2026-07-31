@@ -57,7 +57,8 @@ export const LANGUAGES: Language[] = [
         id: "es-ar",
         bcp47: "es-AR",
         label: "Rioplatense Spanish",
-        promptNote: "Speak Rioplatense Spanish (Buenos Aires): voseo, sh-sound for ll/y.",
+        promptNote:
+          "Speak Rioplatense Spanish (Buenos Aires). Use voseo throughout (vos tenés, vos podés, vení, mirá, decime) and never tú or vosotros, the sh-sound for ll and y, and everyday porteño words like che, dale, laburo, bárbaro, boludo (only when friendly and appropriate). If a sentence would be word-for-word identical in neutral Latin American Spanish, rewrite it with voseo before speaking.",
       },
     ],
   },
@@ -114,7 +115,8 @@ export const LANGUAGES: Language[] = [
         id: "fr-qc",
         bcp47: "fr-CA",
         label: "Québécois French",
-        promptNote: "Speak Québécois French with common Quebec vocabulary and pronunciation.",
+        promptNote:
+          "Speak Québécois French. Use the interrogative particle -tu (tu viens-tu?, c'est-tu loin?), Quebec vocabulary (char, chum, blonde, dépanneur, magasiner, présentement, c'est correct, pantoute), and Quebec expressions rather than French-from-France slang. If a sentence would be word-for-word identical in Metropolitan French, rewrite it the way someone in Montreal would say it.",
         beta: true,
       },
     ],
@@ -148,7 +150,8 @@ export const LANGUAGES: Language[] = [
         bcp47: "ja-JP",
         label: "Kansai Japanese",
         nativeLabel: "関西弁",
-        promptNote: "Speak Kansai-ben consistently (Osaka register). Do not drift into standard Japanese.",
+        promptNote:
+          "Speak Osaka Kansai-ben. Use や and やん where standard Japanese uses だ (ええで, せやな), ～へん or ～ひん for the negative (わからへん, できひん), sentence-final ～ねん and ～やん, ～とる for ～ている (何しとん), and ええ, あかん, ほんま, めっちゃ, なんでやねん. For polite speech prefer ～はる (どこ行かはるん) over plain textbook keigo. If a sentence you are about to say would be word-for-word identical in 標準語, rewrite it in Kansai-ben before speaking.",
         beta: true,
       },
     ],
@@ -181,7 +184,8 @@ export const LANGUAGES: Language[] = [
         id: "zh-tw",
         bcp47: "zh-TW",
         label: "Taiwanese Mandarin",
-        promptNote: "Speak Taiwanese Mandarin with Taiwan vocabulary.",
+        promptNote:
+          "Speak Taiwanese Mandarin in traditional characters. Use Taiwan vocabulary rather than mainland terms: 腳踏車 not 自行車, 影片 not 視頻, 網路 not 網絡, 軟體 not 軟件, 計程車 not 出租車, 泡麵 not 方便麵. Use the Taiwanese sentence particles 啦, 喔, 耶, 欸 and phrasing like 有沒有..., 這樣子, 好不好. If a sentence would read as mainland Mandarin, rewrite it the way someone in Taipei would say it.",
         beta: true,
       },
     ],

@@ -152,6 +152,18 @@ body {
   opacity: 0.12;
 }
 
+/* Snackbar entrance: rises into place, per M3 emphasized decelerate. */
+@keyframes snack-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 ::selection {
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);

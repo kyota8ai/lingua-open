@@ -6,7 +6,7 @@ import { buildExportBundle, downloadBundle, downloadEncryptedBundle, importBundl
 import { decryptJson, encryptJson, isEncryptedBundle, type EncryptedBundleFile } from "../lib/crypto";
 import { db } from "../lib/db";
 import type { CEFRLevel } from "../lib/types";
-import { Button, Field, Modal, Select, SectionTitle, TextInput } from "../components/ui";
+import { Button, Field, Modal, Select, SectionTitle, Snackbar, TextInput, type SnackbarTone } from "../components/ui";
 import { ProviderSetup } from "../components/ProviderSetup";
 import { PrivacyBadge } from "../components/PrivacyBadge";
 
@@ -14,7 +14,7 @@ export default function Settings() {
   const settings = useSettings();
   const lang = findLanguage(settings.languageCode);
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; tone: SnackbarTone } | null>(null);
   const [confirmWipe, setConfirmWipe] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportPass, setExportPass] = useState("");
@@ -27,10 +27,16 @@ export default function Settings() {
     if (exportPass.trim()) {
       const file = await encryptJson(JSON.stringify(bundle), exportPass);
       downloadEncryptedBundle(file, bundle.exportedAt);
-      setNotice("Encrypted backup downloaded. Without the passphrase it cannot be opened, including by us.");
+      setNotice({
+        text: "Encrypted backup downloaded. Without the passphrase it cannot be opened, including by us.",
+        tone: "success",
+      });
     } else {
       downloadBundle(bundle);
-      setNotice("Backup downloaded. Keep it somewhere safe; browser data can be cleared by the browser.");
+      setNotice({
+        text: "Backup downloaded. Keep it somewhere safe; browser data can be cleared by the browser.",
+        tone: "success",
+      });
     }
     setExportOpen(false);
     setExportPass("");
@@ -46,10 +52,23 @@ export default function Settings() {
         return;
       }
       const res = await importBundle(validateBundle(raw));
-      setNotice(`Import complete: ${res.sessions} sessions and ${res.vocab} vocabulary cards added.`);
+      setNotice({ text: importSummary(res), tone: "success" });
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Import failed.");
+      setNotice({ text: e instanceof Error ? e.message : "Import failed.", tone: "error" });
     }
+  }
+
+  /*
+   * Import merges, so a re-import of the same file legitimately adds nothing.
+   * Saying "0 sessions added" reads like a failure, so that case gets its own
+   * sentence naming the reason.
+   */
+  function importSummary(res: { sessions: number; vocab: number }): string {
+    if (res.sessions === 0 && res.vocab === 0) {
+      return "Import finished. Everything in that backup was already here, so nothing changed.";
+    }
+    const n = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+    return `Import complete: ${n(res.sessions, "session", "sessions")} and ${n(res.vocab, "vocabulary card", "vocabulary cards")} added.`;
   }
 
   async function runEncryptedImport() {
@@ -58,7 +77,7 @@ export default function Settings() {
       const json = await decryptJson(pendingImport, importPass);
       const res = await importBundle(validateBundle(JSON.parse(json)));
       setPendingImport(null);
-      setNotice(`Import complete: ${res.sessions} sessions and ${res.vocab} vocabulary cards added.`);
+      setNotice({ text: importSummary(res), tone: "success" });
     } catch (e) {
       setImportError(e instanceof Error ? e.message : "Import failed.");
     }
@@ -67,21 +86,14 @@ export default function Settings() {
   async function wipeAll() {
     await Promise.all([db.sessions.clear(), db.vocab.clear()]);
     setConfirmWipe(false);
-    setNotice("All local history and vocabulary deleted.");
+    setNotice({ text: "All local history and vocabulary deleted.", tone: "success" });
   }
 
   return (
     <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-3xl font-semibold tracking-tight mb-8">Settings</h1>
 
-      {notice && (
-        <p
-          className="mb-6 rounded-(--radius-field) border border-line bg-sunken px-4 py-3 text-[14px] text-ink"
-          role="status"
-        >
-          {notice}
-        </p>
-      )}
+      {notice && <Snackbar message={notice.text} tone={notice.tone} onDismiss={() => setNotice(null)} />}
 
       <section className="mb-10" aria-labelledby="s-ai">
         <SectionTitle>AI provider</SectionTitle>

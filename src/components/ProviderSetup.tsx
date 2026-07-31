@@ -130,17 +130,6 @@ export function ProviderSetup() {
         nothing on top.
       </p>
 
-      {settings.provider === "openai" && (
-        <div className="mt-4 flex items-start gap-2.5 rounded-(--radius-field) border border-warn/40 bg-warn-soft px-3.5 py-3">
-          <Warning size={18} className="shrink-0 mt-0.5 text-warn" aria-hidden />
-          <p className="text-[13px] leading-relaxed text-on-warn-soft">
-            <strong>Honest note:</strong> this OpenAI path follows the documented Realtime API but has not yet been
-            exercised with a live key by the maintainer. The Gemini path has. If something breaks here, please open an
-            issue — it will be fixed fast.
-          </p>
-        </div>
-      )}
-
       {settings.provider === "gemini" && (
         <div className="mt-4 flex items-start gap-2.5 rounded-(--radius-field) border border-warn/40 bg-warn-soft px-3.5 py-3">
           <Warning size={18} className="shrink-0 mt-0.5 text-warn" aria-hidden />

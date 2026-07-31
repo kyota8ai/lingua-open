@@ -12,7 +12,7 @@ Licensed under [AGPL-3.0](LICENSE).
 
 ![A roleplay session with mission checklist, live transcript and voice controls](docs/screenshot-talk.png)
 
-> **Status: pre-release.** Feature-complete, and the Gemini Live path is validated with live conversations. The OpenAI Realtime path follows the documented API but has not yet been exercised with a live key, and dialect quality has not been measured. A keyless demo mode lets you try the whole flow today. See [ROADMAP.md](ROADMAP.md).
+> **Status: pre-release.** Feature-complete, and both the Gemini Live and OpenAI Realtime paths are validated with live conversations. Dialect quality is still being measured — presets that drift toward the standard variety are marked beta. A keyless demo mode lets you try the whole flow today. See [ROADMAP.md](ROADMAP.md).
 
 ## Why this exists
 

@@ -3,6 +3,21 @@ import type { Language } from "../types";
 /**
  * Dialect presets cover the varieties the big apps don't teach. Each
  * promptNote is injected into the system prompt verbatim.
+ *
+ * How to write a promptNote for a non-default variety: abstract instructions
+ * ("do not drift into the standard") give the model nothing to check a
+ * sentence against and were reliably ignored. A note that works names three
+ * things:
+ *
+ *   1. grammar markers — the forms that make the variety what it is
+ *      (voseo, بـ prefix, ～へん negation)
+ *   2. vocabulary — the everyday words that differ from the sibling variety
+ *      the model drifts toward, stated as pairs (carro not coche)
+ *   3. a per-sentence rule the model can apply while speaking: if the line
+ *      would be identical in the sibling variety, rewrite it first
+ *
+ * Default varieties (MSA, Hochdeutsch, 標準語...) stay short: they are what
+ * models produce anyway, so there is nothing to defend against.
  */
 export const LANGUAGES: Language[] = [
   {
@@ -17,7 +32,7 @@ export const LANGUAGES: Language[] = [
         label: "Egyptian Arabic",
         nativeLabel: "مصري",
         promptNote:
-          "Speak exclusively in Egyptian Arabic (Cairene). Never drift into Modern Standard Arabic. Use everyday Cairo vocabulary and pronunciation (g for ج).",
+          "Speak exclusively in Egyptian Arabic (Cairene). Never drift into Modern Standard Arabic. Use the بـ prefix for the present (بحب، بتعمل إيه؟), هـ for the future (هروح), مش for negation, and everyday Cairo words: عايز، فين، إزيك، كويس، دلوقتي، ليه، إمتى، كده. Pronounce ج as g. If a line you are about to say would be identical in فصحى, rewrite it the way someone in Cairo would actually say it.",
       },
       {
         id: "ar-lev",
@@ -25,7 +40,7 @@ export const LANGUAGES: Language[] = [
         label: "Levantine Arabic",
         nativeLabel: "شامي",
         promptNote:
-          "Speak exclusively in Levantine Arabic as spoken in Damascus and Beirut. Never drift into Modern Standard Arabic.",
+          "Speak exclusively in Levantine Arabic as spoken in Damascus and Beirut. Never drift into Modern Standard Arabic. Use بدي for wanting, عم + verb for the progressive (عم بحكي), رح for the future, مو and مش for negation, and everyday Levantine words: شو، وين، هلق، كيفك، منيح، كتير، لازم. If a line you are about to say would be identical in فصحى, rewrite it the way someone in Beirut would actually say it.",
       },
       {
         id: "ar-msa",
@@ -45,13 +60,15 @@ export const LANGUAGES: Language[] = [
         id: "es-mx",
         bcp47: "es-MX",
         label: "Mexican Spanish",
-        promptNote: "Speak Mexican Spanish with everyday Mexico City vocabulary. Avoid Castilian forms like vosotros.",
+        promptNote:
+          "Speak Mexican Spanish (Mexico City). Use ustedes and never vosotros, and Mexican vocabulary over peninsular words: carro not coche, computadora not ordenador, celular not móvil, jugo not zumo, platicar not charlar. Use everyday Mexican expressions where natural: ahorita, órale, ándale, qué padre, ¿mande? when asking someone to repeat. If a sentence would be word-for-word identical in peninsular Spanish, prefer the Mexican phrasing.",
       },
       {
         id: "es-es",
         bcp47: "es-ES",
         label: "Castilian Spanish",
-        promptNote: "Speak Castilian Spanish as spoken in Madrid, including vosotros forms.",
+        promptNote:
+          "Speak Castilian Spanish as spoken in Madrid. Use vosotros with its conjugations for informal plural (tenéis, queréis, venid), and peninsular vocabulary: coche, ordenador, móvil, zumo, patatas, conducir. Everyday Madrid expressions where natural: vale, venga, tío/tía among friends, qué guay. If a sentence would be word-for-word identical in Latin American Spanish, prefer the Madrid phrasing.",
       },
       {
         id: "es-ar",
@@ -71,13 +88,15 @@ export const LANGUAGES: Language[] = [
         id: "pt-br",
         bcp47: "pt-BR",
         label: "Brazilian Portuguese",
-        promptNote: "Speak Brazilian Portuguese (São Paulo register).",
+        promptNote:
+          "Speak Brazilian Portuguese (São Paulo register). Use você and vocês, a gente with third-person for we, and the gerund for the progressive (estou fazendo, never estou a fazer). Brazilian vocabulary over European words: ônibus not autocarro, trem not comboio, celular not telemóvel, café da manhã not pequeno-almoço, banheiro not casa de banho. Everyday Brazilian expressions where natural: legal, beleza, cara, tudo bem. If a sentence would read as European Portuguese, rewrite it the way someone in São Paulo would say it.",
       },
       {
         id: "pt-pt",
         bcp47: "pt-PT",
         label: "European Portuguese",
-        promptNote: "Speak European Portuguese as spoken in Lisbon.",
+        promptNote:
+          "Speak European Portuguese as spoken in Lisbon. Use tu with its proper conjugation informally, estar a + infinitive for the progressive (estou a fazer, never estou fazendo), and European vocabulary: autocarro not ônibus, comboio not trem, telemóvel not celular, pequeno-almoço not café da manhã, casa de banho not banheiro. Everyday Lisbon expressions where natural: fixe, giro, pois, está bem. If a sentence would read as Brazilian Portuguese, rewrite it the way someone in Lisbon would say it.",
       },
     ],
   },
@@ -96,7 +115,8 @@ export const LANGUAGES: Language[] = [
         id: "en-gb",
         bcp47: "en-GB",
         label: "British English",
-        promptNote: "Speak natural British English.",
+        promptNote:
+          "Speak natural British English. Use British vocabulary over American: flat not apartment, lift not elevator, queue not line, holiday not vacation, shop not store, mobile not cell phone, quid for pounds. British phrasing where natural: have you got rather than do you have, brilliant, cheers, fancy a..., a bit, fortnight. If a sentence would be word-for-word identical in American English, prefer the British phrasing and vocabulary.",
       },
     ],
   },
